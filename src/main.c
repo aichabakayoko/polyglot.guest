@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-// Main entry point for Polyglot Quest
-<<<<<<< HEAD
-=======
->>>>>>> 624b921 (Initial project structure)
-=======
 #include "raylib.h"
 
 int main() {
@@ -18,4 +12,3 @@ int main() {
     CloseWindow(); 
     return 0;
 }
->>>>>>> origin/feature-ui-menu
