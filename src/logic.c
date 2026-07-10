@@ -14,6 +14,7 @@ void initGame(void) {
 
 void goToScreen(Screen s) {
     state.currentScreen = s;
+ 
 }
 
 void handleMenuNavigation(int choice) {
@@ -28,4 +29,5 @@ void handleMenuNavigation(int choice) {
 
 void backToMenu(void) {
     goToScreen(MENU_SCREEN);
+
 }
