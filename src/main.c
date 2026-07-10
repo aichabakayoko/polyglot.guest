@@ -79,8 +79,10 @@ void drawFlashcard() {
 
     Flashcard currentCard = gameCards[currentCardIndex];
 
-    Rectangle revealBtn = { 510, 520, 120, 45 };
-    Rectangle nextBtn = { 650, 520, 120, 45 };
+    // Responsive positioning for 3 balanced action buttons below the card layout
+    Rectangle prevBtn   = { 440, 520, 110, 45 };
+    Rectangle revealBtn = { 565, 520, 110, 45 };
+    Rectangle nextBtn   = { 690, 520, 110, 45 };
 
     DrawRectangle(40, 40, 220, 640, DARKGRAY);
     DrawText("CATEGORIES", 60, 60, 20, GOLD);
@@ -100,15 +102,27 @@ void drawFlashcard() {
     }
 
     Vector2 mousePos = GetMousePosition();
+    bool overPrev   = CheckCollisionPointRec(mousePos, prevBtn);
     bool overReveal = CheckCollisionPointRec(mousePos, revealBtn);
-    bool overNext = CheckCollisionPointRec(mousePos, nextBtn);
+    bool overNext   = CheckCollisionPointRec(mousePos, nextBtn);
 
+    // Render PREV Button
+    DrawRectangleRec(prevBtn, overPrev ? (Color){230, 150, 40, 255} : (Color){200, 120, 25, 255});
+    DrawText("PREV", prevBtn.x + (prevBtn.width/2) - (MeasureText("PREV", 16)/2), prevBtn.y + 14, 16, WHITE);
+
+    // Render REVEAL Button
     DrawRectangleRec(revealBtn, overReveal ? LIME : GREEN);
     DrawText("REVEAL", revealBtn.x + (revealBtn.width/2) - (MeasureText("REVEAL", 16)/2), revealBtn.y + 14, 16, WHITE);
 
+    // Render NEXT Button
     DrawRectangleRec(nextBtn, overNext ? BLUE : DARKBLUE);
     DrawText("NEXT", nextBtn.x + (nextBtn.width/2) - (MeasureText("NEXT", 16)/2), nextBtn.y + 14, 16, WHITE);
 
+    // Interaction Management
+    if (overPrev && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        isRevealed = false;
+        currentCardIndex = (currentCardIndex - 1 + totalCards) % totalCards;
+    }
     if (overReveal && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         isRevealed = !isRevealed;
     }
