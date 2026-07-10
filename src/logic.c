@@ -14,4 +14,20 @@ void initGame(void) {
 
 void goToScreen(Screen s) {
     state.currentScreen = s;
+ 
+}
+
+void handleMenuNavigation(int choice) {
+    if (choice == 1) {
+        goToScreen(FLASHCARD_SCREEN);
+    } else if (choice == 2) {
+        goToScreen(SCENARIO_SCREEN);
+    } else if (choice == 3) {
+        goToScreen(PROGRESS_SCREEN);
+    }
+}
+
+void backToMenu(void) {
+    goToScreen(MENU_SCREEN);
+
 }
