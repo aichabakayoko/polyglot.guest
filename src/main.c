@@ -19,7 +19,8 @@ void drawMenu() {
 
     Rectangle btnFlashcards = { 1280 / 2 - 150, 260, 300, 50 };
     Rectangle btnScenario   = { 1280 / 2 - 150, 340, 300, 50 };
-    Rectangle btnExit       = { 1280 / 2 - 150, 420, 300, 50 };
+    Rectangle btnProgress   = { 1280 / 2 - 150, 420, 300, 50 };
+    Rectangle btnExit       = { 1280 / 2 - 150, 500, 300, 50 };
 
     Vector2 mousePos = GetMousePosition();
 
@@ -44,6 +45,17 @@ void drawMenu() {
     }
     DrawRectangleRec(btnScenario, colorScenario);
     DrawText("SCENARIO MODE", btnScenario.x + (btnScenario.width / 2) - (MeasureText("SCENARIO MODE", 20) / 2), btnScenario.y + 15, 20, WHITE);
+
+    // Progress Button Interaction
+    Color colorProgress = (Color){74, 45, 140, 255}; 
+    if (CheckCollisionPointRec(mousePos, btnProgress)) {
+        colorProgress = (Color){100, 61, 190, 255}; 
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            state.currentScreen = PROGRESS_SCREEN;
+        }
+    }
+    DrawRectangleRec(btnProgress, colorProgress);
+    DrawText("PROGRESS", btnProgress.x + (btnProgress.width / 2) - (MeasureText("PROGRESS", 20) / 2), btnProgress.y + 15, 20, WHITE);
 
     // Exit Button Interaction
     Color colorExit = (Color){140, 28, 28, 255}; 
