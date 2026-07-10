@@ -3,10 +3,10 @@
 #include "logic.h"
 #include "data.h"  
 #include <stdio.h> 
+#include <stdbool.h>
 
 extern GameState state;
 
-// Your data structures combined with Nayima's UI array
 static int totalCards = 0;
 static Flashcard gameCards[30];
 
@@ -74,10 +74,8 @@ void drawFlashcard() {
         return;
     }
 
-    // Points directly to Saïda's central state tracker
     Flashcard currentCard = gameCards[state.currentCardIndex];
 
-    // Responsive positioning for 3 balanced action buttons below the card layout
     Rectangle prevBtn   = { 440, 520, 110, 45 };
     Rectangle revealBtn = { 565, 520, 110, 45 };
     Rectangle nextBtn   = { 690, 520, 110, 45 };
@@ -90,52 +88,41 @@ void drawFlashcard() {
     Color parchment = (Color){ 245, 237, 208, 255 };
     DrawRectangleRounded((Rectangle){ 320, 100, 640, 380 }, 0.04f, 4, parchment);
     
-    DrawText(currentCard.arabic, 320 + (640/2) - (MeasureText(currentCard.arabic, 48)/2), 160, 48, BLACK);
-    DrawText(currentCard.transliteration, 320 + (640/2) - (MeasureText(currentCard.transliteration, 22)/2), 250, 22, DARKGRAY);
+    DrawText(currentCard.arabic, 320 + (640 / 2) - (MeasureText(currentCard.arabic, 48) / 2), 160, 48, BLACK);
+    DrawText(currentCard.transliteration, 320 + (640 / 2) - (MeasureText(currentCard.transliteration, 22) / 2), 250, 22, DARKGRAY);
 
-    // Connected to Saïda's logic properties
     if (state.isRevealed) {
-        DrawText(currentCard.english, 320 + (640/2) - (MeasureText(currentCard.english, 26)/2), 340, 26, (Color){27, 58, 92, 255});
+        DrawText(currentCard.english, 320 + (640 / 2) - (MeasureText(currentCard.english, 26) / 2), 340, 26, (Color){27, 58, 92, 255});
     } else {
-        DrawText("Click Reveal to see meaning", 320 + (640/2) - (MeasureText("Click Reveal to see meaning", 18)/2), 340, 18, GRAY);
+        DrawText("Click Reveal to see meaning", 320 + (640 / 2) - (MeasureText("Click Reveal to see meaning", 18) / 2), 340, 18, GRAY);
     }
 
     Vector2 mousePos = GetMousePosition();
-<<<<<<< HEAD
     bool overPrev   = CheckCollisionPointRec(mousePos, prevBtn);
     bool overReveal = CheckCollisionPointRec(mousePos, revealBtn);
     bool overNext   = CheckCollisionPointRec(mousePos, nextBtn);
-=======
-    bool overReveal = CheckCollisionPointRec(mousePos, btnExit ? revealBtn : revealBtn); // Safeguard reference
-    bool overNext = CheckCollisionPointRec(mousePos, nextBtn);
->>>>>>> origin/develop
 
-    // Render PREV Button
+    // Render Buttons
     DrawRectangleRec(prevBtn, overPrev ? (Color){230, 150, 40, 255} : (Color){200, 120, 25, 255});
-    DrawText("PREV", prevBtn.x + (prevBtn.width/2) - (MeasureText("PREV", 16)/2), prevBtn.y + 14, 16, WHITE);
+    DrawText("PREV", prevBtn.x + (prevBtn.width / 2) - (MeasureText("PREV", 16) / 2), prevBtn.y + 14, 16, WHITE);
 
-    // Render REVEAL Button
     DrawRectangleRec(revealBtn, overReveal ? LIME : GREEN);
-    DrawText("REVEAL", revealBtn.x + (revealBtn.width/2) - (MeasureText("REVEAL", 16)/2), revealBtn.y + 14, 16, WHITE);
+    DrawText("REVEAL", revealBtn.x + (revealBtn.width / 2) - (MeasureText("REVEAL", 16) / 2), revealBtn.y + 14, 16, WHITE);
 
-    // Render NEXT Button
     DrawRectangleRec(nextBtn, overNext ? BLUE : DARKBLUE);
-    DrawText("NEXT", nextBtn.x + (nextBtn.width/2) - (MeasureText("NEXT", 16)/2), nextBtn.y + 14, 16, WHITE);
+    DrawText("NEXT", nextBtn.x + (nextBtn.width / 2) - (MeasureText("NEXT", 16) / 2), nextBtn.y + 14, 16, WHITE);
 
-<<<<<<< HEAD
-    // Interaction Management
+    // Click Actions
     if (overPrev && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        isRevealed = false;
-        currentCardIndex = (currentCardIndex - 1 + totalCards) % totalCards;
+        state.isRevealed = false;
+        state.currentCardIndex = (state.currentCardIndex - 1 + totalCards) % totalCards;
     }
-=======
-    // Call Saïda's brain logic routines
->>>>>>> origin/develop
     if (overReveal && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        revealCard(); 
+        state.isRevealed = !state.isRevealed; 
     }
     if (overNext && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        nextCard(); 
+        state.isRevealed = false;
+        state.currentCardIndex = (state.currentCardIndex + 1) % totalCards; 
     }
 
     DrawRectangle(1020, 40, 220, 640, DARKGRAY);
@@ -159,7 +146,6 @@ int main() {
     InitWindow(1280, 720, "Polyglot Quest");
     SetTargetFPS(60);
 
-    // Your data initialization setup
     totalCards = loadFlashcards(gameCards);
     printf("Successfully initialized backend! Loaded %d cards.\n", totalCards);
 
