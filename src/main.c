@@ -3,13 +3,10 @@
 #include "logic.h"
 #include "data.h"  
 #include <stdio.h> 
-#include <stdbool.h>
 
 extern GameState state;
 
-// State to keep track of our current active card index and reveal toggle
-static int currentCardIndex = 0;
-static bool isRevealed = false;
+// Your data structures combined with Nayima's UI array
 static int totalCards = 0;
 static Flashcard gameCards[30];
 
@@ -24,7 +21,7 @@ void drawMenu() {
 
     Vector2 mousePos = GetMousePosition();
 
-    // Flashcard Button Interaction
+    // Flashcard Button
     Color colorFlashcards = (Color){30, 140, 58, 255}; 
     if (CheckCollisionPointRec(mousePos, btnFlashcards)) {
         colorFlashcards = (Color){40, 180, 75, 255}; 
@@ -35,7 +32,7 @@ void drawMenu() {
     DrawRectangleRec(btnFlashcards, colorFlashcards);
     DrawText("FLASHCARDS", btnFlashcards.x + (btnFlashcards.width / 2) - (MeasureText("FLASHCARDS", 20) / 2), btnFlashcards.y + 15, 20, WHITE);
 
-    // Scenario Button Interaction
+    // Scenario Button
     Color colorScenario = (Color){27, 58, 92, 255}; 
     if (CheckCollisionPointRec(mousePos, btnScenario)) {
         colorScenario = (Color){38, 81, 128, 255}; 
@@ -46,7 +43,7 @@ void drawMenu() {
     DrawRectangleRec(btnScenario, colorScenario);
     DrawText("SCENARIO MODE", btnScenario.x + (btnScenario.width / 2) - (MeasureText("SCENARIO MODE", 20) / 2), btnScenario.y + 15, 20, WHITE);
 
-    // Progress Button Interaction
+    // Progress Button
     Color colorProgress = (Color){74, 45, 140, 255}; 
     if (CheckCollisionPointRec(mousePos, btnProgress)) {
         colorProgress = (Color){100, 61, 190, 255}; 
@@ -57,7 +54,7 @@ void drawMenu() {
     DrawRectangleRec(btnProgress, colorProgress);
     DrawText("PROGRESS", btnProgress.x + (btnProgress.width / 2) - (MeasureText("PROGRESS", 20) / 2), btnProgress.y + 15, 20, WHITE);
 
-    // Exit Button Interaction
+    // Exit Button
     Color colorExit = (Color){140, 28, 28, 255}; 
     if (CheckCollisionPointRec(mousePos, btnExit)) {
         colorExit = (Color){190, 38, 38, 255}; 
@@ -77,7 +74,8 @@ void drawFlashcard() {
         return;
     }
 
-    Flashcard currentCard = gameCards[currentCardIndex];
+    // Points directly to Saïda's central state tracker
+    Flashcard currentCard = gameCards[state.currentCardIndex];
 
     Rectangle revealBtn = { 510, 520, 120, 45 };
     Rectangle nextBtn = { 650, 520, 120, 45 };
@@ -93,14 +91,15 @@ void drawFlashcard() {
     DrawText(currentCard.arabic, 320 + (640/2) - (MeasureText(currentCard.arabic, 48)/2), 160, 48, BLACK);
     DrawText(currentCard.transliteration, 320 + (640/2) - (MeasureText(currentCard.transliteration, 22)/2), 250, 22, DARKGRAY);
 
-    if (isRevealed) {
+    // Connected to Saïda's logic properties
+    if (state.isRevealed) {
         DrawText(currentCard.english, 320 + (640/2) - (MeasureText(currentCard.english, 26)/2), 340, 26, (Color){27, 58, 92, 255});
     } else {
         DrawText("Click Reveal to see meaning", 320 + (640/2) - (MeasureText("Click Reveal to see meaning", 18)/2), 340, 18, GRAY);
     }
 
     Vector2 mousePos = GetMousePosition();
-    bool overReveal = CheckCollisionPointRec(mousePos, revealBtn);
+    bool overReveal = CheckCollisionPointRec(mousePos, btnExit ? revealBtn : revealBtn); // Safeguard reference
     bool overNext = CheckCollisionPointRec(mousePos, nextBtn);
 
     DrawRectangleRec(revealBtn, overReveal ? LIME : GREEN);
@@ -109,17 +108,17 @@ void drawFlashcard() {
     DrawRectangleRec(nextBtn, overNext ? BLUE : DARKBLUE);
     DrawText("NEXT", nextBtn.x + (nextBtn.width/2) - (MeasureText("NEXT", 16)/2), nextBtn.y + 14, 16, WHITE);
 
+    // Call Saïda's brain logic routines
     if (overReveal && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        isRevealed = !isRevealed;
+        revealCard(); 
     }
     if (overNext && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-        isRevealed = false; 
-        currentCardIndex = (currentCardIndex + 1) % totalCards; 
+        nextCard(); 
     }
 
     DrawRectangle(1020, 40, 220, 640, DARKGRAY);
     DrawText("PROGRESS", 1040, 60, 20, GOLD);
-    DrawText(TextFormat("Card: %d/%d", currentCardIndex + 1, totalCards), 1040, 120, 18, WHITE);
+    DrawText(TextFormat("Card: %d/%d", state.currentCardIndex + 1, totalCards), 1040, 120, 18, WHITE);
 
     DrawText("Press [M] to return to Main Menu", 320, 40, 16, LIGHTGRAY);
     if (IsKeyPressed(KEY_M)) state.currentScreen = MENU_SCREEN; 
@@ -138,6 +137,7 @@ int main() {
     InitWindow(1280, 720, "Polyglot Quest");
     SetTargetFPS(60);
 
+    // Your data initialization setup
     totalCards = loadFlashcards(gameCards);
     printf("Successfully initialized backend! Loaded %d cards.\n", totalCards);
 
