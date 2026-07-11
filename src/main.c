@@ -10,6 +10,10 @@ extern GameState state;
 static int totalCards = 0;
 static Flashcard gameCards[30];
 
+// Added from GitHub: Scenario storage variables
+static int totalScenarios = 0;
+static Scenario gameScenarios[3];
+
 void drawMenu() {
     DrawText("POLYGLOT QUEST", 1280 / 2 - MeasureText("POLYGLOT QUEST", 48) / 2, 100, 48, (Color){233, 196, 106, 255}); 
     DrawText("Learn Arabic. Live the Language.", 1280 / 2 - MeasureText("Learn Arabic. Live the Language.", 20) / 2, 160, 20, (Color){245, 237, 208, 255});
