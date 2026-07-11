@@ -193,7 +193,6 @@ void drawScenario() {
     DrawRectangleRec(npcBox, (Color){38, 81, 128, 255});
     DrawRectangleLinesEx(npcBox, 3, GOLD);
     
-    // Fixed: Pulling out MeasureText to avoid embedded macro argument issues
     int npcLabelWidth = MeasureText("MERCHANT", 22);
     int npcPlaceWidth = MeasureText("(NPC Asset Place)", 14);
     DrawText("MERCHANT", npcBox.x + (npcBox.width / 2) - (npcLabelWidth / 2), npcBox.y + 240, 22, WHITE);
@@ -234,55 +233,78 @@ void drawScenario() {
     if (overB && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) selectedOption = 2;
     if (overC && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) selectedOption = 3;
 
+    // Standard explicitly defined explicit configurations 
+    Color customGold  = (Color){ 253, 249, 0, 255 };
+    Color customGreen = (Color){ 0, 228, 48, 255 };
+    Color customRed   = (Color){ 230, 41, 55, 255 };
+
     // Option A Rendering (Correct Answer)
-    DrawRectangleRounded(optA, 0.15f, 4, overA ? (Color){50, 60, 75, 255} : DARKGRAY);
-    DrawRectangleRoundedLines(optA, 0.15f, 4, 2, overA ? GOLD : GRAY);
+    Color bgA = DARKGRAY;
+    Color borderA = GRAY;
+    if (overA) {
+        bgA = (Color){50, 60, 75, 255};
+        borderA = GOLD;
+    }
+    DrawRectangleRounded(optA, 0.15f, 4, bgA);
+    DrawRectangleRoundedLinesEx(optA, 0.15f, 4, 2.0f, borderA);
     DrawText("A", optA.x + 20, optA.y + 16, 20, GOLD);
     const char* textA = "وَعَلَيْكُمُ السَّلَام (wa-alaykum us-salaam)";
     int textAX = optA.x + 70;
     int textAY = optA.y + 18;
     DrawText(textA, textAX, textAY, 18, WHITE);
     
-    int textWidthA = MeasureText(textA, 18); // Pre-calculated
+    int textWidthA = MeasureText(textA, 18);
     if (overA) {
-        DrawLine(textAX, textAY + 20, textAX + textWidthA, textAY + 20, GOLD);
+        DrawLine(textAX, textAY + 20, textAX + textWidthA, textAY + 20, customGold);
     }
     if (selectedOption == 1) {
-        DrawText("v", optA.x + optA.width - 40, optA.y + 14, 24, GREEN); 
+        DrawText("v", optA.x + optA.width - 40, optA.y + 14, 24, customGreen); 
     }
 
     // Option B Rendering (Wrong Answer)
-    DrawRectangleRounded(optB, 0.15f, 4, overB ? (Color){50, 60, 75, 255} : DARKGRAY);
-    DrawRectangleRoundedLines(optB, 0.15f, 4, 2, overB ? GOLD : GRAY);
+    Color bgB = DARKGRAY;
+    Color borderB = GRAY;
+    if (overB) {
+        bgB = (Color){50, 60, 75, 255};
+        borderB = GOLD;
+    }
+    DrawRectangleRounded(optB, 0.15f, 4, bgB);
+    DrawRectangleRoundedLinesEx(optB, 0.15f, 4, 2.0f, borderB);
     DrawText("B", optB.x + 20, optB.y + 16, 20, GOLD);
     const char* textB = "مَرْحَبًا (marhaban)";
     int textBX = optB.x + 70;
     int textBY = optB.y + 18;
     DrawText(textB, textBX, textBY, 18, WHITE);
     
-    int textWidthB = MeasureText(textB, 18); // Pre-calculated
+    int textWidthB = MeasureText(textB, 18);
     if (overB) {
-        DrawLine(textBX, textBY + 20, textBX + textWidthB, textBY + 20, GOLD);
+        DrawLine(textBX, textBY + 20, textBX + textWidthB, textBY + 20, customGold);
     }
     if (selectedOption == 2) {
-        DrawText("X", optB.x + optB.width - 40, optB.y + 16, 22, RED); 
+        DrawText("X", optB.x + optB.width - 40, optB.y + 16, 22, customRed); 
     }
 
     // Option C Rendering (Wrong Answer)
-    DrawRectangleRounded(optC, 0.15f, 4, overC ? (Color){50, 60, 75, 255} : DARKGRAY);
-    DrawRectangleRoundedLines(optC, 0.15f, 4, 2, overC ? GOLD : GRAY);
+    Color bgC = DARKGRAY;
+    Color borderC = GRAY;
+    if (overC) {
+        bgC = (Color){50, 60, 75, 255};
+        borderC = GOLD;
+    }
+    DrawRectangleRounded(optC, 0.15f, 4, bgC);
+    DrawRectangleRoundedLinesEx(optC, 0.15f, 4, 2.0f, borderC);
     DrawText("C", optC.x + 20, optC.y + 16, 20, GOLD);
     const char* textC = "شُكْرًا (shukran)";
     int textCX = optC.x + 70;
     int textCY = optC.y + 18;
     DrawText(textC, textCX, textCY, 18, WHITE);
     
-    int textWidthC = MeasureText(textC, 18); // Pre-calculated
+    int textWidthC = MeasureText(textC, 18);
     if (overC) {
-        DrawLine(textCX, textCY + 20, textCX + textWidthC, textCY + 20, GOLD);
+        DrawLine(textCX, textCY + 20, textCX + textWidthC, textCY + 20, customGold);
     }
     if (selectedOption == 3) {
-        DrawText("X", optC.x + optC.width - 40, optC.y + 16, 22, RED); 
+        DrawText("X", optC.x + optC.width - 40, optC.y + 16, 22, customRed); 
     }
 
     DrawText("Press [M] to return to Main Menu", 60, 40, 14, LIGHTGRAY);
