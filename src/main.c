@@ -159,8 +159,93 @@ void drawFlashcard() {
 
 void drawScenario() {
     ClearBackground((Color){13, 27, 42, 255});
-    DrawText("Scenario Mode Workspace", 400, 300, 30, GOLD);
-    DrawText("Press [M] for Menu", 400, 360, 18, LIGHTGRAY);
+
+    // 1. Step Progress Indicator (Top Center)
+    int totalSteps = 5;
+    int currentStep = 1; 
+    int startX = 1280 / 2 - ((totalSteps - 1) * 60) / 2;
+    int posY = 50;
+
+    DrawLine(startX, posY, startX + (totalSteps - 1) * 60, posY, GRAY);
+
+    for (int i = 0; i < totalSteps; i++) {
+        int circleX = startX + i * 60;
+        if (i + 1 == currentStep) {
+            DrawCircle(circleX, posY, 15, LIME);
+            DrawText(TextFormat("%d", i + 1), circleX - 4, posY - 7, 14, BLACK);
+        } else if (i + 1 < currentStep) {
+            DrawCircle(circleX, posY, 12, GREEN);
+            DrawText(TextFormat("%d", i + 1), circleX - 4, posY - 6, 12, WHITE);
+        } else {
+            DrawCircle(circleX, posY, 12, DARKGRAY);
+            DrawText(TextFormat("%d", i + 1), circleX - 4, posY - 6, 12, LIGHTGRAY);
+        }
+    }
+
+    // 2. NPC Character Placeholder Box
+    Rectangle npcBox = { 60, 120, 260, 520 };
+    DrawRectangleRec(npcBox, (Color){38, 81, 128, 255});
+    DrawRectangleLinesEx(npcBox, 3, GOLD);
+    DrawText("MERCHANT", npcBox.x + (npcBox.width / 2) - (MeasureText("MERCHANT", 22) / 2), npcBox.y + 240, 22, WHITE);
+    DrawText("(NPC Asset Place)", npcBox.x + (npcBox.width / 2) - (MeasureText("(NPC Asset Place)", 14) / 2), npcBox.y + 275, 14, LIGHTGRAY);
+
+    // 3. Dialogue Speech Bubble Card
+    Color parchment = (Color){ 245, 237, 208, 255 };
+    Rectangle speechBubble = { 360, 120, 860, 220 };
+    DrawRectangleRounded(speechBubble, 0.04f, 4, parchment);
+
+    const char* npcArabic = "السَّلَامُ عَلَيْكُمْ";
+    const char* npcTranslit = "as-salaamu alaykum";
+    const char* npcEnglish = "\"Peace be upon you.\"";
+
+    DrawText(npcArabic, speechBubble.x + (speechBubble.width / 2) - (MeasureText(npcArabic, 36) / 2), speechBubble.y + 35, 36, BLACK);
+    DrawText(npcTranslit, speechBubble.x + (speechBubble.width / 2) - (MeasureText(npcTranslit, 18) / 2), speechBubble.y + 100, 18, DARKGRAY);
+    DrawText(npcEnglish, speechBubble.x + (speechBubble.width / 2) - (MeasureText(npcEnglish, 20) / 2), speechBubble.y + 150, 20, (Color){27, 58, 92, 255});
+
+    // 4. Action Prompt Label
+    DrawText("How will you respond?", 360, 365, 20, GOLD);
+
+    // 5. Answer Choices Buttons (A, B, C Staged Layout)
+    Rectangle optA = { 360, 410, 860, 55 };
+    Rectangle optB = { 360, 480, 860, 55 };
+    Rectangle optC = { 360, 550, 860, 55 };
+
+    Vector2 mousePos = GetMousePosition();
+    bool overA = CheckCollisionPointRec(mousePos, optA);
+    bool overB = CheckCollisionPointRec(mousePos, optB);
+    bool overC = CheckCollisionPointRec(mousePos, optC);
+
+    // Option A
+    DrawRectangleRounded(optA, 0.15f, 4, overA ? (Color){50, 60, 75, 255} : DARKGRAY);
+    DrawRectangleRoundedLines(optA, 0.15f, 4, 2, overA ? GOLD : GRAY);
+    DrawText("A", optA.x + 20, optA.y + 16, 20, GOLD);
+    const char* textA = "وَعَلَيْكُمُ السَّلَام (wa-alaykum us-salaam)";
+    int textAX = optA.x + 70;
+    int textAY = optA.y + 18;
+    DrawText(textA, textAX, textAY, 18, WHITE);
+    if (overA) DrawLine(textAX, textAY + 20, textAX + MeasureText(textA, 18), textAY + 20, GOLD);
+
+    // Option B
+    DrawRectangleRounded(optB, 0.15f, 4, overB ? (Color){50, 60, 75, 255} : DARKGRAY);
+    DrawRectangleRoundedLines(optB, 0.15f, 4, 2, overB ? GOLD : GRAY);
+    DrawText("B", optB.x + 20, optB.y + 16, 20, GOLD);
+    const char* textB = "مَرْحَبًا (marhaban)";
+    int textBX = optB.x + 70;
+    int textBY = optB.y + 18;
+    DrawText(textB, textBX, textBY, 18, WHITE);
+    if (overB) DrawLine(textBX, textBY + 20, textBX + MeasureText(textB, 18), textBY + 20, GOLD);
+
+    // Option C
+    DrawRectangleRounded(optC, 0.15f, 4, overC ? (Color){50, 60, 75, 255} : DARKGRAY);
+    DrawRectangleRoundedLines(optC, 0.15f, 4, 2, overC ? GOLD : GRAY);
+    DrawText("C", optC.x + 20, optC.y + 16, 20, GOLD);
+    const char* textC = "شُكْرًا (shukran)";
+    int textCX = optC.x + 70;
+    int textCY = optC.y + 18;
+    DrawText(textC, textCX, textCY, 18, WHITE);
+    if (overC) DrawLine(textCX, textCY + 20, textCX + MeasureText(textC, 18), textCY + 20, GOLD);
+
+    DrawText("Press [M] to return to Main Menu", 60, 40, 14, LIGHTGRAY);
     if (IsKeyPressed(KEY_M)) state.currentScreen = MENU_SCREEN;
 }
 
@@ -173,6 +258,9 @@ int main() {
     // Load Flashcards and Scenarios
     totalCards = loadFlashcards(gameCards);
     totalScenarios = loadScenarios(gameScenarios);
+
+    // Day 6: Load saved progress
+    loadProgress(&state);
 
     printf("Successfully initialized backend! Loaded %d cards and %d scenarios.\n", totalCards, totalScenarios);
 
@@ -199,6 +287,10 @@ int main() {
 
         EndDrawing();
     }
+
+    // Day 6: Save progress when closing game
+    saveProgress(&state);
+
     CloseWindow();
     return 0;
 }
