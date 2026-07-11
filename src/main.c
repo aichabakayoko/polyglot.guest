@@ -155,6 +155,10 @@ void drawFlashcard() {
 
 void drawScenario() {
     ClearBackground((Color){13, 27, 42, 255});
+ feature-flashcards
+    DrawText("Scenario Mode Workspace", 400, 300, 30, GOLD);
+    DrawText("Press [M] for Menu", 400, 360, 18, LIGHTGRAY);
+
 
     // 1. Step Progress Indicator (Top Center)
     int totalSteps = 5;
@@ -248,6 +252,7 @@ void drawScenario() {
     }
 
     DrawText("Press [M] to return to Main Menu", 60, 40, 14, LIGHTGRAY);
+ main
     if (IsKeyPressed(KEY_M)) state.currentScreen = MENU_SCREEN;
 }
 
@@ -257,8 +262,16 @@ int main() {
     InitWindow(1280, 720, "Polyglot Quest");
     SetTargetFPS(60);
 
+ feature-flashcards
+    // Load Flashcards and Scenarios
+    totalCards = loadFlashcards(gameCards);
+    totalScenarios = loadScenarios(gameScenarios);
+
+    printf("Successfully initialized backend! Loaded %d cards and %d scenarios.\n", totalCards, totalScenarios);
+
     totalCards = loadFlashcards(gameCards);
     printf("Successfully initialized backend! Loaded %d cards.\n", totalCards);
+ main
 
     state.currentScreen = MENU_SCREEN;
 

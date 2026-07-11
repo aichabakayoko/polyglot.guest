@@ -3,7 +3,7 @@
 
 #include "types.h"
 
-extern Flashcard flashcards[30];
 int loadFlashcards(Flashcard* cards);
+int loadScenarios(Scenario* scenarios);
 
 #endif
