@@ -66,7 +66,7 @@ void drawMenu() {
     DrawText("EXIT", btnExit.x + (btnExit.width / 2) - (MeasureText("EXIT", 20) / 2), btnExit.y + 15, 20, WHITE);
 }
 
-void drawFlashcard() {void drawFlashcard() {
+void drawFlashcard() {
     ClearBackground((Color){13, 27, 42, 255}); 
 
     if (totalCards == 0) {
@@ -74,10 +74,8 @@ void drawFlashcard() {void drawFlashcard() {
         return;
     }
 
-    // Points directly to Saïda's central state tracker instead of a local copy
     Flashcard currentCard = gameCards[state.currentCardIndex];
 
-    // Responsive positioning for 3 balanced action buttons below the card layout
     Rectangle prevBtn   = { 440, 520, 110, 45 };
     Rectangle revealBtn = { 565, 520, 110, 45 };
     Rectangle nextBtn   = { 690, 520, 110, 45 };
@@ -95,7 +93,6 @@ void drawFlashcard() {void drawFlashcard() {
     DrawText(currentCard.arabic, 320 + (640/2) - (MeasureText(currentCard.arabic, 48)/2), 160, 48, BLACK);
     DrawText(currentCard.transliteration, 320 + (640/2) - (MeasureText(currentCard.transliteration, 22)/2), 250, 22, DARKGRAY);
 
-    // Day 5: Conditional English meaning display based on state.isRevealed
     if (state.isRevealed == 1) {
         DrawText(currentCard.english, 320 + (640/2) - (MeasureText(currentCard.english, 26)/2), 340, 26, (Color){27, 58, 92, 255});
     } else {
@@ -107,7 +104,6 @@ void drawFlashcard() {void drawFlashcard() {
     bool overReveal = CheckCollisionPointRec(mousePos, revealBtn);
     bool overNext   = CheckCollisionPointRec(mousePos, nextBtn);
 
-    // Render Navigation & Control Buttons
     DrawRectangleRec(prevBtn, overPrev ? (Color){230, 150, 40, 255} : (Color){200, 120, 25, 255});
     DrawText("PREV", prevBtn.x + (prevBtn.width/2) - (MeasureText("PREV", 16)/2), prevBtn.y + 14, 16, WHITE);
 
@@ -117,7 +113,6 @@ void drawFlashcard() {void drawFlashcard() {
     DrawRectangleRec(nextBtn, overNext ? BLUE : DARKBLUE);
     DrawText("NEXT", nextBtn.x + (nextBtn.width/2) - (MeasureText("NEXT", 16)/2), nextBtn.y + 14, 16, WHITE);
 
-    // Interaction Management
     if (overPrev && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         state.isRevealed = 0;
         state.currentCardIndex = (state.currentCardIndex - 1 + totalCards) % totalCards;
@@ -130,32 +125,26 @@ void drawFlashcard() {void drawFlashcard() {
         state.currentCardIndex = (state.currentCardIndex + 1) % totalCards; 
     }
 
-    // Day 5: Enhanced Progress Panel with stats and mastery circle
+    // Progress Panel
     DrawRectangle(1020, 40, 220, 640, DARKGRAY);
     DrawText("PROGRESS", 1040, 60, 20, GOLD);
     DrawText(TextFormat("Card: %d/%d", state.currentCardIndex + 1, totalCards), 1040, 120, 18, WHITE);
     
-    // Correct & Wrong Counters
     DrawText(TextFormat("Correct: %d", state.correctCount), 1040, 160, 18, GREEN);
     DrawText(TextFormat("Wrong:   %d", state.wrongCount), 1040, 190, 18, RED);
 
-    // Calculate accuracy percentage safely to avoid division by zero
     int totalAnswers = state.correctCount + state.wrongCount;
     float accuracyPercent = (totalAnswers > 0) ? ((float)state.correctCount / totalAnswers) * 100.0f : 0.0f;
     DrawText(TextFormat("Accuracy: %.0f%%", accuracyPercent), 1040, 230, 18, VIOLET);
 
-    // Draw mastery percentage display using DrawRing for the circular indicator
     Vector2 center = { 1130, 340 };
     float radiusInner = 35.0f;
     float radiusOuter = 45.0f;
     float startAngle = 0.0f;
-    // Map accuracy percentage (0-100) to degrees (0-360)
     float endAngle = (accuracyPercent / 100.0f) * 360.0f; 
     int segments = 36;
 
-    // Background circle tracking ring
     DrawRing(center, radiusInner, radiusOuter, 0.0f, 360.0f, segments, BLACK);
-    // Active progress fill ring
     if (accuracyPercent > 0.0f) {
         DrawRing(center, radiusInner, radiusOuter, startAngle, endAngle, segments, GOLD);
     }
@@ -166,8 +155,99 @@ void drawFlashcard() {void drawFlashcard() {
 
 void drawScenario() {
     ClearBackground((Color){13, 27, 42, 255});
-    DrawText("Scenario Mode Workspace", 400, 300, 30, GOLD);
-    DrawText("Press [M] for Menu", 400, 360, 18, LIGHTGRAY);
+
+    // 1. Step Progress Indicator (Top Center)
+    int totalSteps = 5;
+    int currentStep = 1; 
+    int startX = 1280 / 2 - ((totalSteps - 1) * 60) / 2;
+    int posY = 50;
+
+    DrawLine(startX, posY, startX + (totalSteps - 1) * 60, posY, GRAY);
+
+    for (int i = 0; i < totalSteps; i++) {
+        int circleX = startX + i * 60;
+        if (i + 1 == currentStep) {
+            DrawCircle(circleX, posY, 15, LIME);
+            DrawText(TextFormat("%d", i + 1), circleX - 4, posY - 7, 14, BLACK);
+        } else if (i + 1 < currentStep) {
+            DrawCircle(circleX, posY, 12, GREEN);
+            DrawText(TextFormat("%d", i + 1), circleX - 4, posY - 6, 12, WHITE);
+        } else {
+            DrawCircle(circleX, posY, 12, DARKGRAY);
+            DrawText(TextFormat("%d", i + 1), circleX - 4, posY - 6, 12, LIGHTGRAY);
+        }
+    }
+
+    // 2. NPC Character Placeholder Box
+    Rectangle npcBox = { 60, 120, 260, 520 };
+    DrawRectangleRec(npcBox, (Color){38, 81, 128, 255});
+    DrawRectangleLinesEx(npcBox, 3, GOLD);
+    DrawText("MERCHANT", npcBox.x + (npcBox.width / 2) - (MeasureText("MERCHANT", 22) / 2), npcBox.y + 240, 22, WHITE);
+    DrawText("(NPC Asset Place)", npcBox.x + (npcBox.width / 2) - (MeasureText("(NPC Asset Place)", 14) / 2), npcBox.y + 275, 14, LIGHTGRAY);
+
+    // 3. Dialogue Speech Bubble Card
+    Color parchment = (Color){ 245, 237, 208, 255 };
+    Rectangle speechBubble = { 360, 120, 860, 220 };
+    DrawRectangleRounded(speechBubble, 0.04f, 4, parchment);
+
+    const char* npcArabic = "السَّلَامُ عَلَيْكُمْ";
+    const char* npcTranslit = "as-salaamu alaykum";
+    const char* npcEnglish = "\"Peace be upon you.\"";
+
+    DrawText(npcArabic, speechBubble.x + (speechBubble.width / 2) - (MeasureText(npcArabic, 36) / 2), speechBubble.y + 35, 36, BLACK);
+    DrawText(npcTranslit, speechBubble.x + (speechBubble.width / 2) - (MeasureText(npcTranslit, 18) / 2), speechBubble.y + 100, 18, DARKGRAY);
+    DrawText(npcEnglish, speechBubble.x + (speechBubble.width / 2) - (MeasureText(npcEnglish, 20) / 2), speechBubble.y + 150, 20, (Color){27, 58, 92, 255});
+
+    // 4. Action Prompt Label
+    DrawText("How will you respond?", 360, 365, 20, GOLD);
+
+    // 5. Answer Choices Buttons (A, B, C Staged Layout)
+    Rectangle optA = { 360, 410, 860, 55 };
+    Rectangle optB = { 360, 480, 860, 55 };
+    Rectangle optC = { 360, 550, 860, 55 };
+
+    Vector2 mousePos = GetMousePosition();
+    bool overA = CheckCollisionPointRec(mousePos, optA);
+    bool overB = CheckCollisionPointRec(mousePos, optB);
+    bool overC = CheckCollisionPointRec(mousePos, optC);
+
+    // Option A Rendering with Hover Underline
+    DrawRectangleRounded(optA, 0.15f, 4, overA ? (Color){50, 60, 75, 255} : DARKGRAY);
+    DrawRectangleRoundedLines(optA, 0.15f, 4, 2, overA ? GOLD : GRAY);
+    DrawText("A", optA.x + 20, optA.y + 16, 20, GOLD);
+    const char* textA = "وَعَلَيْكُمُ السَّلَام (wa-alaykum us-salaam)";
+    int textAX = optA.x + 70;
+    int textAY = optA.y + 18;
+    DrawText(textA, textAX, textAY, 18, WHITE);
+    if (overA) {
+        DrawLine(textAX, textAY + 20, textAX + MeasureText(textA, 18), textAY + 20, GOLD);
+    }
+
+    // Option B Rendering with Hover Underline
+    DrawRectangleRounded(optB, 0.15f, 4, overB ? (Color){50, 60, 75, 255} : DARKGRAY);
+    DrawRectangleRoundedLines(optB, 0.15f, 4, 2, overB ? GOLD : GRAY);
+    DrawText("B", optB.x + 20, optB.y + 16, 20, GOLD);
+    const char* textB = "مَرْحَبًا (marhaban)";
+    int textBX = optB.x + 70;
+    int textBY = optB.y + 18;
+    DrawText(textB, textBX, textBY, 18, WHITE);
+    if (overB) {
+        DrawLine(textBX, textBY + 20, textBX + MeasureText(textB, 18), textBY + 20, GOLD);
+    }
+
+    // Option C Rendering with Hover Underline
+    DrawRectangleRounded(optC, 0.15f, 4, overC ? (Color){50, 60, 75, 255} : DARKGRAY);
+    DrawRectangleRoundedLines(optC, 0.15f, 4, 2, overC ? GOLD : GRAY);
+    DrawText("C", optC.x + 20, optC.y + 16, 20, GOLD);
+    const char* textC = "شُكْرًا (shukran)";
+    int textCX = optC.x + 70;
+    int textCY = optC.y + 18;
+    DrawText(textC, textCX, textCY, 18, WHITE);
+    if (overC) {
+        DrawLine(textCX, textCY + 20, textCX + MeasureText(textC, 18), textCY + 20, GOLD);
+    }
+
+    DrawText("Press [M] to return to Main Menu", 60, 40, 14, LIGHTGRAY);
     if (IsKeyPressed(KEY_M)) state.currentScreen = MENU_SCREEN;
 }
 
