@@ -7,6 +7,7 @@
 
 extern GameState state;
 
+// Function declarations to resolve implicit declaration warnings
 int loadScenarios(Scenario* scenarios);
 void loadProgress(GameState* src_state);
 void saveProgress(const GameState* src_state);
