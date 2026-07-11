@@ -66,7 +66,7 @@ void drawMenu() {
     DrawText("EXIT", btnExit.x + (btnExit.width / 2) - (MeasureText("EXIT", 20) / 2), btnExit.y + 15, 20, WHITE);
 }
 
-void drawFlashcard() {void drawFlashcard() {
+void drawFlashcard() {
     ClearBackground((Color){13, 27, 42, 255}); 
 
     if (totalCards == 0) {
@@ -74,10 +74,8 @@ void drawFlashcard() {void drawFlashcard() {
         return;
     }
 
-    // Points directly to Saïda's central state tracker instead of a local copy
     Flashcard currentCard = gameCards[state.currentCardIndex];
 
-    // Responsive positioning for 3 balanced action buttons below the card layout
     Rectangle prevBtn   = { 440, 520, 110, 45 };
     Rectangle revealBtn = { 565, 520, 110, 45 };
     Rectangle nextBtn   = { 690, 520, 110, 45 };
@@ -95,7 +93,6 @@ void drawFlashcard() {void drawFlashcard() {
     DrawText(currentCard.arabic, 320 + (640/2) - (MeasureText(currentCard.arabic, 48)/2), 160, 48, BLACK);
     DrawText(currentCard.transliteration, 320 + (640/2) - (MeasureText(currentCard.transliteration, 22)/2), 250, 22, DARKGRAY);
 
-    // Day 5: Conditional English meaning display based on state.isRevealed
     if (state.isRevealed == 1) {
         DrawText(currentCard.english, 320 + (640/2) - (MeasureText(currentCard.english, 26)/2), 340, 26, (Color){27, 58, 92, 255});
     } else {
@@ -107,7 +104,6 @@ void drawFlashcard() {void drawFlashcard() {
     bool overReveal = CheckCollisionPointRec(mousePos, revealBtn);
     bool overNext   = CheckCollisionPointRec(mousePos, nextBtn);
 
-    // Render Navigation & Control Buttons
     DrawRectangleRec(prevBtn, overPrev ? (Color){230, 150, 40, 255} : (Color){200, 120, 25, 255});
     DrawText("PREV", prevBtn.x + (prevBtn.width/2) - (MeasureText("PREV", 16)/2), prevBtn.y + 14, 16, WHITE);
 
@@ -117,7 +113,6 @@ void drawFlashcard() {void drawFlashcard() {
     DrawRectangleRec(nextBtn, overNext ? BLUE : DARKBLUE);
     DrawText("NEXT", nextBtn.x + (nextBtn.width/2) - (MeasureText("NEXT", 16)/2), nextBtn.y + 14, 16, WHITE);
 
-    // Interaction Management
     if (overPrev && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         state.isRevealed = 0;
         state.currentCardIndex = (state.currentCardIndex - 1 + totalCards) % totalCards;
@@ -130,32 +125,26 @@ void drawFlashcard() {void drawFlashcard() {
         state.currentCardIndex = (state.currentCardIndex + 1) % totalCards; 
     }
 
-    // Day 5: Enhanced Progress Panel with stats and mastery circle
+    // Progress Panel
     DrawRectangle(1020, 40, 220, 640, DARKGRAY);
     DrawText("PROGRESS", 1040, 60, 20, GOLD);
     DrawText(TextFormat("Card: %d/%d", state.currentCardIndex + 1, totalCards), 1040, 120, 18, WHITE);
     
-    // Correct & Wrong Counters
     DrawText(TextFormat("Correct: %d", state.correctCount), 1040, 160, 18, GREEN);
     DrawText(TextFormat("Wrong:   %d", state.wrongCount), 1040, 190, 18, RED);
 
-    // Calculate accuracy percentage safely to avoid division by zero
     int totalAnswers = state.correctCount + state.wrongCount;
     float accuracyPercent = (totalAnswers > 0) ? ((float)state.correctCount / totalAnswers) * 100.0f : 0.0f;
     DrawText(TextFormat("Accuracy: %.0f%%", accuracyPercent), 1040, 230, 18, VIOLET);
 
-    // Draw mastery percentage display using DrawRing for the circular indicator
     Vector2 center = { 1130, 340 };
     float radiusInner = 35.0f;
     float radiusOuter = 45.0f;
     float startAngle = 0.0f;
-    // Map accuracy percentage (0-100) to degrees (0-360)
     float endAngle = (accuracyPercent / 100.0f) * 360.0f; 
     int segments = 36;
 
-    // Background circle tracking ring
     DrawRing(center, radiusInner, radiusOuter, 0.0f, 360.0f, segments, BLACK);
-    // Active progress fill ring
     if (accuracyPercent > 0.0f) {
         DrawRing(center, radiusInner, radiusOuter, startAngle, endAngle, segments, GOLD);
     }
