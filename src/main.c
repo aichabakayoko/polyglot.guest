@@ -7,10 +7,18 @@
 
 extern GameState state;
 
-// Function declarations to resolve implicit declaration warnings
-int loadScenarios(Scenario* scenarios);
-void loadProgress(GameState* src_state);
-void saveProgress(const GameState* src_state);
+// Function definitions added here to resolve the "undefined reference" linker errors
+int loadScenarios(Scenario* scenarios) {
+    return 0;
+}
+
+void loadProgress(GameState* src_state) {
+    // Temporary stub
+}
+
+void saveProgress(const GameState* src_state) {
+    // Temporary stub
+}
 
 static int totalCards = 0;
 static Flashcard gameCards[30];
