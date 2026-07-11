@@ -10,6 +10,10 @@ extern GameState state;
 static int totalCards = 0;
 static Flashcard gameCards[30];
 
+// Day 5: Scenario storage variables
+static int totalScenarios = 0;
+static Scenario gameScenarios[3];
+
 void drawMenu() {
     DrawText("POLYGLOT QUEST", 1280 / 2 - MeasureText("POLYGLOT QUEST", 48) / 2, 100, 48, (Color){233, 196, 106, 255}); 
     DrawText("Learn Arabic. Live the Language.", 1280 / 2 - MeasureText("Learn Arabic. Live the Language.", 20) / 2, 160, 20, (Color){245, 237, 208, 255});
@@ -215,7 +219,7 @@ void drawScenario() {
     bool overB = CheckCollisionPointRec(mousePos, optB);
     bool overC = CheckCollisionPointRec(mousePos, optC);
 
-    // Option A Rendering with Hover Underline
+    // Option A
     DrawRectangleRounded(optA, 0.15f, 4, overA ? (Color){50, 60, 75, 255} : DARKGRAY);
     DrawRectangleRoundedLines(optA, 0.15f, 4, 2, overA ? GOLD : GRAY);
     DrawText("A", optA.x + 20, optA.y + 16, 20, GOLD);
@@ -223,11 +227,9 @@ void drawScenario() {
     int textAX = optA.x + 70;
     int textAY = optA.y + 18;
     DrawText(textA, textAX, textAY, 18, WHITE);
-    if (overA) {
-        DrawLine(textAX, textAY + 20, textAX + MeasureText(textA, 18), textAY + 20, GOLD);
-    }
+    if (overA) DrawLine(textAX, textAY + 20, textAX + MeasureText(textA, 18), textAY + 20, GOLD);
 
-    // Option B Rendering with Hover Underline
+    // Option B
     DrawRectangleRounded(optB, 0.15f, 4, overB ? (Color){50, 60, 75, 255} : DARKGRAY);
     DrawRectangleRoundedLines(optB, 0.15f, 4, 2, overB ? GOLD : GRAY);
     DrawText("B", optB.x + 20, optB.y + 16, 20, GOLD);
@@ -235,11 +237,9 @@ void drawScenario() {
     int textBX = optB.x + 70;
     int textBY = optB.y + 18;
     DrawText(textB, textBX, textBY, 18, WHITE);
-    if (overB) {
-        DrawLine(textBX, textBY + 20, textBX + MeasureText(textB, 18), textBY + 20, GOLD);
-    }
+    if (overB) DrawLine(textBX, textBY + 20, textBX + MeasureText(textB, 18), textBY + 20, GOLD);
 
-    // Option C Rendering with Hover Underline
+    // Option C
     DrawRectangleRounded(optC, 0.15f, 4, overC ? (Color){50, 60, 75, 255} : DARKGRAY);
     DrawRectangleRoundedLines(optC, 0.15f, 4, 2, overC ? GOLD : GRAY);
     DrawText("C", optC.x + 20, optC.y + 16, 20, GOLD);
@@ -247,9 +247,7 @@ void drawScenario() {
     int textCX = optC.x + 70;
     int textCY = optC.y + 18;
     DrawText(textC, textCX, textCY, 18, WHITE);
-    if (overC) {
-        DrawLine(textCX, textCY + 20, textCX + MeasureText(textC, 18), textCY + 20, GOLD);
-    }
+    if (overC) DrawLine(textCX, textCY + 20, textCX + MeasureText(textC, 18), textCY + 20, GOLD);
 
     DrawText("Press [M] to return to Main Menu", 60, 40, 14, LIGHTGRAY);
  main
@@ -267,10 +265,21 @@ int main() {
     totalCards = loadFlashcards(gameCards);
     totalScenarios = loadScenarios(gameScenarios);
 
+    // Day 6: Load saved progress
+    loadProgress(&state);
+
+    printf("Successfully initialized backend! Loaded %d cards and %d scenarios.\n", totalCards, totalScenarios);
+
+ feature-flashcards
+    // Load Flashcards and Scenarios
+    totalCards = loadFlashcards(gameCards);
+    totalScenarios = loadScenarios(gameScenarios);
+
     printf("Successfully initialized backend! Loaded %d cards and %d scenarios.\n", totalCards, totalScenarios);
 
     totalCards = loadFlashcards(gameCards);
     printf("Successfully initialized backend! Loaded %d cards.\n", totalCards);
+ main
  main
 
     state.currentScreen = MENU_SCREEN;
@@ -296,6 +305,10 @@ int main() {
 
         EndDrawing();
     }
+
+    // Day 6: Save progress when closing game
+    saveProgress(&state);
+
     CloseWindow();
     return 0;
 }
