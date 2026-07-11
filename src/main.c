@@ -156,6 +156,16 @@ void drawFlashcard() {
 void drawScenario() {
     ClearBackground((Color){13, 27, 42, 255});
 
+    // Tracks selected option locally (0 = none, 1 = A, 2 = B, 3 = C)
+    static int selectedOption = 0;
+
+    // Reset selection when entering screen anew via shortcut
+    if (IsKeyPressed(KEY_M)) {
+        selectedOption = 0;
+        state.currentScreen = MENU_SCREEN;
+        return;
+    }
+
     // 1. Step Progress Indicator (Top Center)
     int totalSteps = 5;
     int currentStep = 1; 
@@ -182,8 +192,12 @@ void drawScenario() {
     Rectangle npcBox = { 60, 120, 260, 520 };
     DrawRectangleRec(npcBox, (Color){38, 81, 128, 255});
     DrawRectangleLinesEx(npcBox, 3, GOLD);
-    DrawText("MERCHANT", npcBox.x + (npcBox.width / 2) - (MeasureText("MERCHANT", 22) / 2), npcBox.y + 240, 22, WHITE);
-    DrawText("(NPC Asset Place)", npcBox.x + (npcBox.width / 2) - (MeasureText("(NPC Asset Place)", 14) / 2), npcBox.y + 275, 14, LIGHTGRAY);
+    
+    // Fixed: Pulling out MeasureText to avoid embedded macro argument issues
+    int npcLabelWidth = MeasureText("MERCHANT", 22);
+    int npcPlaceWidth = MeasureText("(NPC Asset Place)", 14);
+    DrawText("MERCHANT", npcBox.x + (npcBox.width / 2) - (npcLabelWidth / 2), npcBox.y + 240, 22, WHITE);
+    DrawText("(NPC Asset Place)", npcBox.x + (npcBox.width / 2) - (npcPlaceWidth / 2), npcBox.y + 275, 14, LIGHTGRAY);
 
     // 3. Dialogue Speech Bubble Card
     Color parchment = (Color){ 245, 237, 208, 255 };
@@ -194,9 +208,13 @@ void drawScenario() {
     const char* npcTranslit = "as-salaamu alaykum";
     const char* npcEnglish = "\"Peace be upon you.\"";
 
-    DrawText(npcArabic, speechBubble.x + (speechBubble.width / 2) - (MeasureText(npcArabic, 36) / 2), speechBubble.y + 35, 36, BLACK);
-    DrawText(npcTranslit, speechBubble.x + (speechBubble.width / 2) - (MeasureText(npcTranslit, 18) / 2), speechBubble.y + 100, 18, DARKGRAY);
-    DrawText(npcEnglish, speechBubble.x + (speechBubble.width / 2) - (MeasureText(npcEnglish, 20) / 2), speechBubble.y + 150, 20, (Color){27, 58, 92, 255});
+    int arabicWidth = MeasureText(npcArabic, 36);
+    int translitWidth = MeasureText(npcTranslit, 18);
+    int englishWidth = MeasureText(npcEnglish, 20);
+
+    DrawText(npcArabic, speechBubble.x + (speechBubble.width / 2) - (arabicWidth / 2), speechBubble.y + 35, 36, BLACK);
+    DrawText(npcTranslit, speechBubble.x + (speechBubble.width / 2) - (translitWidth / 2), speechBubble.y + 100, 18, DARKGRAY);
+    DrawText(npcEnglish, speechBubble.x + (speechBubble.width / 2) - (englishWidth / 2), speechBubble.y + 150, 20, (Color){27, 58, 92, 255});
 
     // 4. Action Prompt Label
     DrawText("How will you respond?", 360, 365, 20, GOLD);
@@ -211,7 +229,12 @@ void drawScenario() {
     bool overB = CheckCollisionPointRec(mousePos, optB);
     bool overC = CheckCollisionPointRec(mousePos, optC);
 
-    // Option A Rendering with Hover Underline
+    // Click logic handlers
+    if (overA && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) selectedOption = 1;
+    if (overB && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) selectedOption = 2;
+    if (overC && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) selectedOption = 3;
+
+    // Option A Rendering (Correct Answer)
     DrawRectangleRounded(optA, 0.15f, 4, overA ? (Color){50, 60, 75, 255} : DARKGRAY);
     DrawRectangleRoundedLines(optA, 0.15f, 4, 2, overA ? GOLD : GRAY);
     DrawText("A", optA.x + 20, optA.y + 16, 20, GOLD);
@@ -219,11 +242,16 @@ void drawScenario() {
     int textAX = optA.x + 70;
     int textAY = optA.y + 18;
     DrawText(textA, textAX, textAY, 18, WHITE);
+    
+    int textWidthA = MeasureText(textA, 18); // Pre-calculated
     if (overA) {
-        DrawLine(textAX, textAY + 20, textAX + MeasureText(textA, 18), textAY + 20, GOLD);
+        DrawLine(textAX, textAY + 20, textAX + textWidthA, textAY + 20, GOLD);
+    }
+    if (selectedOption == 1) {
+        DrawText("v", optA.x + optA.width - 40, optA.y + 14, 24, GREEN); 
     }
 
-    // Option B Rendering with Hover Underline
+    // Option B Rendering (Wrong Answer)
     DrawRectangleRounded(optB, 0.15f, 4, overB ? (Color){50, 60, 75, 255} : DARKGRAY);
     DrawRectangleRoundedLines(optB, 0.15f, 4, 2, overB ? GOLD : GRAY);
     DrawText("B", optB.x + 20, optB.y + 16, 20, GOLD);
@@ -231,11 +259,16 @@ void drawScenario() {
     int textBX = optB.x + 70;
     int textBY = optB.y + 18;
     DrawText(textB, textBX, textBY, 18, WHITE);
+    
+    int textWidthB = MeasureText(textB, 18); // Pre-calculated
     if (overB) {
-        DrawLine(textBX, textBY + 20, textBX + MeasureText(textB, 18), textBY + 20, GOLD);
+        DrawLine(textBX, textBY + 20, textBX + textWidthB, textBY + 20, GOLD);
+    }
+    if (selectedOption == 2) {
+        DrawText("X", optB.x + optB.width - 40, optB.y + 16, 22, RED); 
     }
 
-    // Option C Rendering with Hover Underline
+    // Option C Rendering (Wrong Answer)
     DrawRectangleRounded(optC, 0.15f, 4, overC ? (Color){50, 60, 75, 255} : DARKGRAY);
     DrawRectangleRoundedLines(optC, 0.15f, 4, 2, overC ? GOLD : GRAY);
     DrawText("C", optC.x + 20, optC.y + 16, 20, GOLD);
@@ -243,12 +276,16 @@ void drawScenario() {
     int textCX = optC.x + 70;
     int textCY = optC.y + 18;
     DrawText(textC, textCX, textCY, 18, WHITE);
+    
+    int textWidthC = MeasureText(textC, 18); // Pre-calculated
     if (overC) {
-        DrawLine(textCX, textCY + 20, textCX + MeasureText(textC, 18), textCY + 20, GOLD);
+        DrawLine(textCX, textCY + 20, textCX + textWidthC, textCY + 20, GOLD);
+    }
+    if (selectedOption == 3) {
+        DrawText("X", optC.x + optC.width - 40, optC.y + 16, 22, RED); 
     }
 
     DrawText("Press [M] to return to Main Menu", 60, 40, 14, LIGHTGRAY);
-    if (IsKeyPressed(KEY_M)) state.currentScreen = MENU_SCREEN;
 }
 
 void drawProgress() {}
