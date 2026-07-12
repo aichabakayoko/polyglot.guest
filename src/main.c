@@ -10,7 +10,11 @@ extern GameState state;
 static int totalCards = 0;
 static Flashcard gameCards[30];
 
+ feature-ui-menu
+// Added from GitHub: Scenario storage variables
+
 // Day 5: Scenario storage variables
+ main
 static int totalScenarios = 0;
 static Scenario gameScenarios[3];
 
@@ -164,6 +168,16 @@ void drawScenario() {
     DrawText("Press [M] for Menu", 400, 360, 18, LIGHTGRAY);
 
 
+    // Tracks selected option locally (0 = none, 1 = A, 2 = B, 3 = C)
+    static int selectedOption = 0;
+
+    // Reset selection when entering screen anew via shortcut
+    if (IsKeyPressed(KEY_M)) {
+        selectedOption = 0;
+        state.currentScreen = MENU_SCREEN;
+        return;
+    }
+
     // 1. Step Progress Indicator (Top Center)
     int totalSteps = 5;
     int currentStep = 1; 
@@ -190,8 +204,11 @@ void drawScenario() {
     Rectangle npcBox = { 60, 120, 260, 520 };
     DrawRectangleRec(npcBox, (Color){38, 81, 128, 255});
     DrawRectangleLinesEx(npcBox, 3, GOLD);
-    DrawText("MERCHANT", npcBox.x + (npcBox.width / 2) - (MeasureText("MERCHANT", 22) / 2), npcBox.y + 240, 22, WHITE);
-    DrawText("(NPC Asset Place)", npcBox.x + (npcBox.width / 2) - (MeasureText("(NPC Asset Place)", 14) / 2), npcBox.y + 275, 14, LIGHTGRAY);
+    
+    int npcLabelWidth = MeasureText("MERCHANT", 22);
+    int npcPlaceWidth = MeasureText("(NPC Asset Place)", 14);
+    DrawText("MERCHANT", npcBox.x + (npcBox.width / 2) - (npcLabelWidth / 2), npcBox.y + 240, 22, WHITE);
+    DrawText("(NPC Asset Place)", npcBox.x + (npcBox.width / 2) - (npcPlaceWidth / 2), npcBox.y + 275, 14, LIGHTGRAY);
 
     // 3. Dialogue Speech Bubble Card
     Color parchment = (Color){ 245, 237, 208, 255 };
@@ -202,9 +219,13 @@ void drawScenario() {
     const char* npcTranslit = "as-salaamu alaykum";
     const char* npcEnglish = "\"Peace be upon you.\"";
 
-    DrawText(npcArabic, speechBubble.x + (speechBubble.width / 2) - (MeasureText(npcArabic, 36) / 2), speechBubble.y + 35, 36, BLACK);
-    DrawText(npcTranslit, speechBubble.x + (speechBubble.width / 2) - (MeasureText(npcTranslit, 18) / 2), speechBubble.y + 100, 18, DARKGRAY);
-    DrawText(npcEnglish, speechBubble.x + (speechBubble.width / 2) - (MeasureText(npcEnglish, 20) / 2), speechBubble.y + 150, 20, (Color){27, 58, 92, 255});
+    int arabicWidth = MeasureText(npcArabic, 36);
+    int translitWidth = MeasureText(npcTranslit, 18);
+    int englishWidth = MeasureText(npcEnglish, 20);
+
+    DrawText(npcArabic, speechBubble.x + (speechBubble.width / 2) - (arabicWidth / 2), speechBubble.y + 35, 36, BLACK);
+    DrawText(npcTranslit, speechBubble.x + (speechBubble.width / 2) - (translitWidth / 2), speechBubble.y + 100, 18, DARKGRAY);
+    DrawText(npcEnglish, speechBubble.x + (speechBubble.width / 2) - (englishWidth / 2), speechBubble.y + 150, 20, (Color){27, 58, 92, 255});
 
     // 4. Action Prompt Label
     DrawText("How will you respond?", 360, 365, 20, GOLD);
@@ -219,39 +240,115 @@ void drawScenario() {
     bool overB = CheckCollisionPointRec(mousePos, optB);
     bool overC = CheckCollisionPointRec(mousePos, optC);
 
+feature-ui-menu
+    // Click logic handlers
+    if (overA && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) selectedOption = 1;
+    if (overB && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) selectedOption = 2;
+    if (overC && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) selectedOption = 3;
+
+    // Standard explicitly defined explicit configurations 
+    Color customGold  = (Color){ 253, 249, 0, 255 };
+    Color customGreen = (Color){ 0, 228, 48, 255 };
+    Color customRed   = (Color){ 230, 41, 55, 255 };
+
+    // Option A Rendering (Correct Answer)
+    Color bgA = DARKGRAY;
+    Color borderA = GRAY;
+    if (overA) {
+        bgA = (Color){50, 60, 75, 255};
+        borderA = GOLD;
+    }
+    DrawRectangleRounded(optA, 0.15f, 4, bgA);
+    DrawRectangleRoundedLinesEx(optA, 0.15f, 4, 2.0f, borderA);
+
     // Option A
     DrawRectangleRounded(optA, 0.15f, 4, overA ? (Color){50, 60, 75, 255} : DARKGRAY);
     DrawRectangleRoundedLines(optA, 0.15f, 4, 2, overA ? GOLD : GRAY);
+ main
     DrawText("A", optA.x + 20, optA.y + 16, 20, GOLD);
     const char* textA = "وَعَلَيْكُمُ السَّلَام (wa-alaykum us-salaam)";
     int textAX = optA.x + 70;
     int textAY = optA.y + 18;
     DrawText(textA, textAX, textAY, 18, WHITE);
+feature-ui-menu
+    
+    int textWidthA = MeasureText(textA, 18);
+    if (overA) {
+        DrawLine(textAX, textAY + 20, textAX + textWidthA, textAY + 20, customGold);
+    }
+    if (selectedOption == 1) {
+        DrawText("v", optA.x + optA.width - 40, optA.y + 14, 24, customGreen); 
+    }
+
+    // Option B Rendering (Wrong Answer)
+    Color bgB = DARKGRAY;
+    Color borderB = GRAY;
+    if (overB) {
+        bgB = (Color){50, 60, 75, 255};
+        borderB = GOLD;
+    }
+    DrawRectangleRounded(optB, 0.15f, 4, bgB);
+    DrawRectangleRoundedLinesEx(optB, 0.15f, 4, 2.0f, borderB);
     if (overA) DrawLine(textAX, textAY + 20, textAX + MeasureText(textA, 18), textAY + 20, GOLD);
 
     // Option B
     DrawRectangleRounded(optB, 0.15f, 4, overB ? (Color){50, 60, 75, 255} : DARKGRAY);
     DrawRectangleRoundedLines(optB, 0.15f, 4, 2, overB ? GOLD : GRAY);
+ main
     DrawText("B", optB.x + 20, optB.y + 16, 20, GOLD);
     const char* textB = "مَرْحَبًا (marhaban)";
     int textBX = optB.x + 70;
     int textBY = optB.y + 18;
     DrawText(textB, textBX, textBY, 18, WHITE);
+feature-ui-menu
+    
+    int textWidthB = MeasureText(textB, 18);
+    if (overB) {
+        DrawLine(textBX, textBY + 20, textBX + textWidthB, textBY + 20, customGold);
+    }
+    if (selectedOption == 2) {
+        DrawText("X", optB.x + optB.width - 40, optB.y + 16, 22, customRed); 
+    }
+
+    // Option C Rendering (Wrong Answer)
+    Color bgC = DARKGRAY;
+    Color borderC = GRAY;
+    if (overC) {
+        bgC = (Color){50, 60, 75, 255};
+        borderC = GOLD;
+    }
+    DrawRectangleRounded(optC, 0.15f, 4, bgC);
+    DrawRectangleRoundedLinesEx(optC, 0.15f, 4, 2.0f, borderC);
+
     if (overB) DrawLine(textBX, textBY + 20, textBX + MeasureText(textB, 18), textBY + 20, GOLD);
 
     // Option C
     DrawRectangleRounded(optC, 0.15f, 4, overC ? (Color){50, 60, 75, 255} : DARKGRAY);
     DrawRectangleRoundedLines(optC, 0.15f, 4, 2, overC ? GOLD : GRAY);
+ main
     DrawText("C", optC.x + 20, optC.y + 16, 20, GOLD);
     const char* textC = "شُكْرًا (shukran)";
     int textCX = optC.x + 70;
     int textCY = optC.y + 18;
     DrawText(textC, textCX, textCY, 18, WHITE);
+ feature-ui-menu
+    
+    int textWidthC = MeasureText(textC, 18);
+    if (overC) {
+        DrawLine(textCX, textCY + 20, textCX + textWidthC, textCY + 20, customGold);
+    }
+    if (selectedOption == 3) {
+        DrawText("X", optC.x + optC.width - 40, optC.y + 16, 22, customRed); 
+    }
+
+    DrawText("Press [M] to return to Main Menu", 60, 40, 14, LIGHTGRAY);
+
     if (overC) DrawLine(textCX, textCY + 20, textCX + MeasureText(textC, 18), textCY + 20, GOLD);
 
     DrawText("Press [M] to return to Main Menu", 60, 40, 14, LIGHTGRAY);
  main
     if (IsKeyPressed(KEY_M)) state.currentScreen = MENU_SCREEN;
+ main
 }
 
 void drawProgress() {}
