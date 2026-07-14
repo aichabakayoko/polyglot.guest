@@ -27,11 +27,11 @@
 
 ### Compilation (VS Code / Terminal)
 ```bash
-gcc src/main.c src/data.c src/logic.c -I src/ -L src/ -lraylib -lopengl32 -lgdi32 -lwinmm -o polyglot.exe    
+gcc src/main.c src/logic.c src/data.c -I"C:/raylib/raylib/src" -L"C:/raylib/raylib/src" -lraylib -lopengl32 -lgdi32 -lwinmm -o build/game.exe
  ```   
 ### Execution
 
 ```bash
-./polyglot.exe
+./build/game.exe
 ```
 
