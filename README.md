@@ -47,6 +47,7 @@ polyglot.guest/
 ├── test.sh             # UNIX/Bash compile & execute script
 └── src/                # Project source files
     ├── data.c / .h     # Data storage, saving/loading, and initialization
+    ├── file.c / .h     # Save/load progress (file I/O)
     ├── logic.c / .h    # Core state machine, scoring, and input validation
     ├── main.c          # Game entry point, engine loop, and UI rendering
     └── types.h         # Shared structures, screens, and game states
