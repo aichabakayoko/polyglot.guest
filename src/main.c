@@ -7,6 +7,19 @@
 
 extern GameState state;
 
+// Function definitions added here to resolve the "undefined reference" linker errors
+int loadScenarios(Scenario* scenarios) {
+    return 0;
+}
+
+void loadProgress(GameState* src_state) {
+    // Temporary stub
+}
+
+void saveProgress(const GameState* src_state) {
+    // Temporary stub
+}
+
 static int totalCards = 0;
 static Flashcard gameCards[30];
 
@@ -159,10 +172,16 @@ void drawFlashcard() {
 
 void drawScenario() {
     ClearBackground((Color){13, 27, 42, 255});
- feature-flashcards
-    DrawText("Scenario Mode Workspace", 400, 300, 30, GOLD);
-    DrawText("Press [M] for Menu", 400, 360, 18, LIGHTGRAY);
 
+    // Tracks selected option locally (0 = none, 1 = A, 2 = B, 3 = C)
+    static int selectedOption = 0;
+
+    // Reset selection when entering screen anew via shortcut
+    if (IsKeyPressed(KEY_M)) {
+        selectedOption = 0;
+        state.currentScreen = MENU_SCREEN;
+        return;
+    }
 
     // 1. Step Progress Indicator (Top Center)
     int totalSteps = 5;
@@ -190,8 +209,11 @@ void drawScenario() {
     Rectangle npcBox = { 60, 120, 260, 520 };
     DrawRectangleRec(npcBox, (Color){38, 81, 128, 255});
     DrawRectangleLinesEx(npcBox, 3, GOLD);
-    DrawText("MERCHANT", npcBox.x + (npcBox.width / 2) - (MeasureText("MERCHANT", 22) / 2), npcBox.y + 240, 22, WHITE);
-    DrawText("(NPC Asset Place)", npcBox.x + (npcBox.width / 2) - (MeasureText("(NPC Asset Place)", 14) / 2), npcBox.y + 275, 14, LIGHTGRAY);
+    
+    int npcLabelWidth = MeasureText("MERCHANT", 22);
+    int npcPlaceWidth = MeasureText("(NPC Asset Place)", 14);
+    DrawText("MERCHANT", npcBox.x + (npcBox.width / 2) - (npcLabelWidth / 2), npcBox.y + 240, 22, WHITE);
+    DrawText("(NPC Asset Place)", npcBox.x + (npcBox.width / 2) - (npcPlaceWidth / 2), npcBox.y + 275, 14, LIGHTGRAY);
 
     // 3. Dialogue Speech Bubble Card
     Color parchment = (Color){ 245, 237, 208, 255 };
@@ -202,9 +224,13 @@ void drawScenario() {
     const char* npcTranslit = "as-salaamu alaykum";
     const char* npcEnglish = "\"Peace be upon you.\"";
 
-    DrawText(npcArabic, speechBubble.x + (speechBubble.width / 2) - (MeasureText(npcArabic, 36) / 2), speechBubble.y + 35, 36, BLACK);
-    DrawText(npcTranslit, speechBubble.x + (speechBubble.width / 2) - (MeasureText(npcTranslit, 18) / 2), speechBubble.y + 100, 18, DARKGRAY);
-    DrawText(npcEnglish, speechBubble.x + (speechBubble.width / 2) - (MeasureText(npcEnglish, 20) / 2), speechBubble.y + 150, 20, (Color){27, 58, 92, 255});
+    int arabicWidth = MeasureText(npcArabic, 36);
+    int translitWidth = MeasureText(npcTranslit, 18);
+    int englishWidth = MeasureText(npcEnglish, 20);
+
+    DrawText(npcArabic, speechBubble.x + (speechBubble.width / 2) - (arabicWidth / 2), speechBubble.y + 35, 36, BLACK);
+    DrawText(npcTranslit, speechBubble.x + (speechBubble.width / 2) - (translitWidth / 2), speechBubble.y + 100, 18, DARKGRAY);
+    DrawText(npcEnglish, speechBubble.x + (speechBubble.width / 2) - (englishWidth / 2), speechBubble.y + 150, 20, (Color){27, 58, 92, 255});
 
     // 4. Action Prompt Label
     DrawText("How will you respond?", 360, 365, 20, GOLD);
@@ -219,48 +245,196 @@ void drawScenario() {
     bool overB = CheckCollisionPointRec(mousePos, optB);
     bool overC = CheckCollisionPointRec(mousePos, optC);
 
-    // Option A
-    DrawRectangleRounded(optA, 0.15f, 4, overA ? (Color){50, 60, 75, 255} : DARKGRAY);
-    DrawRectangleRoundedLines(optA, 0.15f, 4, 2, overA ? GOLD : GRAY);
+    // Click logic handlers
+    if (overA && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) selectedOption = 1;
+    if (overB && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) selectedOption = 2;
+    if (overC && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) selectedOption = 3;
+
+    Color customGold  = (Color){ 253, 249, 0, 255 };
+    Color customGreen = (Color){ 0, 228, 48, 255 };
+    Color customRed   = (Color){ 230, 41, 55, 255 };
+
+    // Option A Rendering (Correct Answer)
+    Color bgA = DARKGRAY;
+    Color borderA = GRAY;
+    if (overA) {
+        bgA = (Color){50, 60, 75, 255};
+        borderA = GOLD;
+    }
+    DrawRectangleRounded(optA, 0.15f, 4, bgA);
+    DrawRectangleRoundedLinesEx(optA, 0.15f, 4, 2.0f, borderA);
     DrawText("A", optA.x + 20, optA.y + 16, 20, GOLD);
     const char* textA = "وَعَلَيْكُمُ السَّلَام (wa-alaykum us-salaam)";
     int textAX = optA.x + 70;
     int textAY = optA.y + 18;
     DrawText(textA, textAX, textAY, 18, WHITE);
-    if (overA) DrawLine(textAX, textAY + 20, textAX + MeasureText(textA, 18), textAY + 20, GOLD);
+    
+    int textWidthA = MeasureText(textA, 18);
+    if (overA) {
+        DrawLine(textAX, textAY + 20, textAX + textWidthA, textAY + 20, customGold);
+    }
+    if (selectedOption == 1) {
+        DrawText("v", optA.x + optA.width - 40, optA.y + 14, 24, customGreen); 
+    }
 
-    // Option B
-    DrawRectangleRounded(optB, 0.15f, 4, overB ? (Color){50, 60, 75, 255} : DARKGRAY);
-    DrawRectangleRoundedLines(optB, 0.15f, 4, 2, overB ? GOLD : GRAY);
+    // Option B Rendering (Wrong Answer)
+    Color bgB = DARKGRAY;
+    Color borderB = GRAY;
+    if (overB) {
+        bgB = (Color){50, 60, 75, 255};
+        borderB = GOLD;
+    }
+    DrawRectangleRounded(optB, 0.15f, 4, bgB);
+    DrawRectangleRoundedLinesEx(optB, 0.15f, 4, 2.0f, borderB);
     DrawText("B", optB.x + 20, optB.y + 16, 20, GOLD);
     const char* textB = "مَرْحَبًا (marhaban)";
     int textBX = optB.x + 70;
     int textBY = optB.y + 18;
     DrawText(textB, textBX, textBY, 18, WHITE);
-    if (overB) DrawLine(textBX, textBY + 20, textBX + MeasureText(textB, 18), textBY + 20, GOLD);
+    
+    int textWidthB = MeasureText(textB, 18);
+    if (overB) {
+        DrawLine(textBX, textBY + 20, textBX + textWidthB, textBY + 20, customGold);
+    }
+    if (selectedOption == 2) {
+        DrawText("X", optB.x + optB.width - 40, optB.y + 16, 22, customRed); 
+    }
 
-    // Option C
-    DrawRectangleRounded(optC, 0.15f, 4, overC ? (Color){50, 60, 75, 255} : DARKGRAY);
-    DrawRectangleRoundedLines(optC, 0.15f, 4, 2, overC ? GOLD : GRAY);
+    // Option C Rendering (Wrong Answer)
+    Color bgC = DARKGRAY;
+    Color borderC = GRAY;
+    if (overC) {
+        bgC = (Color){50, 60, 75, 255};
+        borderC = GOLD;
+    }
+    DrawRectangleRounded(optC, 0.15f, 4, bgC);
+    DrawRectangleRoundedLinesEx(optC, 0.15f, 4, 2.0f, borderC);
     DrawText("C", optC.x + 20, optC.y + 16, 20, GOLD);
     const char* textC = "شُكْرًا (shukran)";
     int textCX = optC.x + 70;
     int textCY = optC.y + 18;
     DrawText(textC, textCX, textCY, 18, WHITE);
-    if (overC) DrawLine(textCX, textCY + 20, textCX + MeasureText(textC, 18), textCY + 20, GOLD);
+    
+    int textWidthC = MeasureText(textC, 18);
+    if (overC) {
+        DrawLine(textCX, textCY + 20, textCX + textWidthC, textCY + 20, customGold);
+    }
+    if (selectedOption == 3) {
+        DrawText("X", optC.x + optC.width - 40, optC.y + 16, 22, customRed); 
+    }
 
     DrawText("Press [M] to return to Main Menu", 60, 40, 14, LIGHTGRAY);
- main
     if (IsKeyPressed(KEY_M)) state.currentScreen = MENU_SCREEN;
 }
 
-void drawProgress() {}
+void drawProgress() {
+    ClearBackground((Color){13, 27, 42, 255});
+
+    if (IsKeyPressed(KEY_M)) {
+        state.currentScreen = MENU_SCREEN;
+        return;
+    }
+
+    const char* titleText = "YOUR PROGRESS";
+    int titleWidth = MeasureText(titleText, 32);
+    DrawText(titleText, 1280 / 2 - titleWidth / 2, 40, 32, GOLD);
+
+    int totalAnswers = state.correctCount + state.wrongCount;
+    float accuracyPercent = (totalAnswers > 0) ? ((float)state.correctCount / totalAnswers) * 100.0f : 0.0f;
+    
+    int totalScore = (state.correctCount * 10) - (state.wrongCount * 5);
+    if (totalScore < 0) totalScore = 0;
+
+    Rectangle trophyBox = { 60, 120, 260, 440 };
+    DrawRectangleRec(trophyBox, (Color){27, 58, 92, 255});
+    DrawRectangleLinesEx(trophyBox, 3, GOLD);
+    
+    DrawCircle(60 + 130, 120 + 120, 50, (Color){233, 196, 106, 255});
+    DrawText("🏆", 60 + 130 - 20, 120 + 95, 40, WHITE);
+
+    int scoreLabelWidth = MeasureText("TOTAL SCORE", 20);
+    int scoreNumWidth = MeasureText(TextFormat("%d", totalScore), 42);
+    DrawText("TOTAL SCORE", 60 + 130 - scoreLabelWidth / 2, 120 + 240, 20, LIGHTGRAY);
+    DrawText(TextFormat("%d", totalScore), 60 + 130 - scoreNumWidth / 2, 120 + 280, 42, GOLD);
+
+    int starsEarned = 1;
+    if (totalScore >= 150) starsEarned = 5;
+    else if (totalScore >= 100) starsEarned = 4;
+    else if (totalScore >= 50)  starsEarned = 3;
+    else if (totalScore >= 20)  starsEarned = 2;
+
+    int starY = 120 + 360;
+    int starStartX = 60 + 130 - (5 * 24) / 2;
+    for (int i = 0; i < 5; i++) {
+        if (i < starsEarned) {
+            DrawText("★", starStartX + (i * 24), starY, 24, GOLD);
+        } else {
+            DrawText("☆", starStartX + (i * 24), starY, 24, GRAY);
+        }
+    }
+
+    Rectangle overviewBox = { 360, 120, 410, 440 };
+    DrawRectangleRounded(overviewBox, 0.03f, 4, (Color){38, 81, 128, 255});
+    DrawText("STATISTICS OVERVIEW", overviewBox.x + 25, overviewBox.y + 25, 20, GOLD);
+
+    int startY = overviewBox.y + 80;
+    int spacingY = 55;
+
+    DrawText(TextFormat("Flashcard Score:   %d pts", state.correctCount * 6), overviewBox.x + 35, startY, 18, WHITE);
+    DrawText(TextFormat("Scenario Score:    %d pts", state.correctCount * 4), overviewBox.x + 35, startY + spacingY, 18, WHITE);
+    DrawText(TextFormat("Correct Answers:   %d", state.correctCount), overviewBox.x + 35, startY + (spacingY * 2), 18, LIME);
+    DrawText(TextFormat("Wrong Answers:     %d", state.wrongCount), overviewBox.x + 35, startY + (spacingY * 3), 18, RED);
+    DrawText(TextFormat("Total Accuracy:    %.0f%%", accuracyPercent), overviewBox.x + 35, startY + (spacingY * 4), 18, VIOLET);
+
+    Rectangle masteryBox = { 810, 120, 410, 440 };
+    DrawRectangleRounded(masteryBox, 0.03f, 4, (Color){20, 40, 65, 255});
+    DrawRectangleRoundedLinesEx(masteryBox, 0.03f, 4, 2.0f, DARKGRAY);
+    DrawText("MASTERY BY CATEGORY", masteryBox.x + 25, masteryBox.y + 25, 20, GOLD);
+
+    int barX = masteryBox.x + 35;
+    int barWidth = 340;
+    int barHeight = 22;
+
+    DrawText("Basics (Greetings & Introductions)", barX, masteryBox.y + 80, 16, LIGHTGRAY);
+    DrawRectangle(barX, masteryBox.y + 110, barWidth, barHeight, DARKGRAY); 
+    int fillWidthBasics = (int)((accuracyPercent / 100.0f) * barWidth);
+    DrawRectangle(barX, masteryBox.y + 110, fillWidthBasics, barHeight, GREEN); 
+
+    DrawText("Marketplace (Numbers & Bartering)", barX, masteryBox.y + 165, 16, LIGHTGRAY);
+    DrawRectangle(barX, masteryBox.y + 195, barWidth, barHeight, DARKGRAY);
+    DrawRectangle(barX, masteryBox.y + 195, (int)(0.0f * barWidth), barHeight, ORANGE);
+
+    DrawText("Travel (Directions & Navigation)", barX, masteryBox.y + 250, 16, LIGHTGRAY);
+    DrawRectangle(barX, masteryBox.y + 280, barWidth, barHeight, DARKGRAY);
+    DrawRectangle(barX, masteryBox.y + 280, (int)(0.0f * barWidth), barHeight, BLUE);
+
+    Rectangle btnReplay = { 1280 / 2 - 240, 590, 220, 50 };
+    Rectangle btnMenu   = { 1280 / 2 + 20,  590, 220, 50 };
+
+    Vector2 mousePos = GetMousePosition();
+    bool overReplay = CheckCollisionPointRec(mousePos, btnReplay);
+    bool overMenu   = CheckCollisionPointRec(mousePos, btnMenu);
+
+    if (overReplay && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        state.currentScreen = SCENARIO_SCREEN;
+    }
+    if (overMenu && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        state.currentScreen = MENU_SCREEN;
+    }
+
+    DrawRectangleRec(btnReplay, overReplay ? (Color){38, 81, 128, 255} : (Color){27, 58, 92, 255});
+    DrawText("REPLAY SCENARIO", btnReplay.x + (btnReplay.width / 2) - (MeasureText("REPLAY SCENARIO", 16) / 2), btnReplay.y + 17, 16, WHITE);
+
+    DrawRectangleRec(btnMenu, overMenu ? (Color){40, 180, 75, 255} : (Color){30, 140, 58, 255});
+    DrawText("BACK TO MENU", btnMenu.x + (btnMenu.width / 2) - (MeasureText("BACK TO MENU", 16) / 2), btnMenu.y + 17, 16, WHITE);
+
+    DrawText("Press [M] to return to Main Menu", 60, 40, 14, LIGHTGRAY);
+}
 
 int main() {
     InitWindow(1280, 720, "Polyglot Quest");
     SetTargetFPS(60);
 
- feature-flashcards
     // Load Flashcards and Scenarios
     totalCards = loadFlashcards(gameCards);
     totalScenarios = loadScenarios(gameScenarios);
@@ -269,18 +443,6 @@ int main() {
     loadProgress(&state);
 
     printf("Successfully initialized backend! Loaded %d cards and %d scenarios.\n", totalCards, totalScenarios);
-
- feature-flashcards
-    // Load Flashcards and Scenarios
-    totalCards = loadFlashcards(gameCards);
-    totalScenarios = loadScenarios(gameScenarios);
-
-    printf("Successfully initialized backend! Loaded %d cards and %d scenarios.\n", totalCards, totalScenarios);
-
-    totalCards = loadFlashcards(gameCards);
-    printf("Successfully initialized backend! Loaded %d cards.\n", totalCards);
- main
- main
 
     state.currentScreen = MENU_SCREEN;
 
