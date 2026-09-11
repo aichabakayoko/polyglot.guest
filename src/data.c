@@ -51,7 +51,7 @@ int loadFlashcards(Flashcard* cards) {
     return 30;
 }
 
-Scenario scenarios[10] = {
+Scenario gameScenarios[10] = {
     // 0: Coffee
     {"من فضلك أريد قهوة", "Min fadlik ureedu qahwah", "Please, I want coffee", {"Shukran", "Marhaban", "Afwan"}, 0, 10},
     // 1: Market
@@ -75,8 +75,9 @@ Scenario scenarios[10] = {
 };
 
 int loadScenarios(Scenario* sc) {
+    if (sc == NULL) return 0;
     for (int i = 0; i < 10; i++) {
-        sc[i] = scenarios[i];
+        sc[i] = gameScenarios[i];
     }
     return 10;
 }
