@@ -4,7 +4,17 @@
 
 extern GameState state;
 
+// Static texture variable for lazy loading trophy.png
+static Texture2D trophyTexture;
+static bool trophyLoaded = false;
+
 void drawProgress(void) {
+    // Lazy-load trophy texture when progress screen opens
+    if (!trophyLoaded) {
+        trophyTexture = LoadTexture("assets/images/trophy.png");
+        trophyLoaded = true;
+    }
+
     ClearBackground((Color){13, 27, 42, 255});
 
     if (IsKeyPressed(KEY_M)) {
@@ -26,8 +36,21 @@ void drawProgress(void) {
     DrawRectangleRec(trophyBox, (Color){27, 58, 92, 255});
     DrawRectangleLinesEx(trophyBox, 3, GOLD);
     
+    // Draw real trophy texture if loaded, or fallback background circle
     DrawCircle(60 + 130, 120 + 120, 50, (Color){233, 196, 106, 255});
-    DrawText("🏆", 60 + 130 - 20, 120 + 95, 40, WHITE);
+    if (trophyTexture.id > 0) {
+        // Draw trophy image centered inside the gold circle
+        DrawTexturePro(
+            trophyTexture,
+            (Rectangle){ 0, 0, (float)trophyTexture.width, (float)trophyTexture.height },
+            (Rectangle){ 60 + 130 - 40, 120 + 120 - 40, 80, 80 },
+            (Vector2){ 0, 0 },
+            0.0f,
+            WHITE
+        );
+    } else {
+        DrawText("🏆", 60 + 130 - 20, 120 + 95, 40, WHITE);
+    }
 
     int scoreLabelWidth = MeasureText("TOTAL SCORE", 20);
     int scoreNumWidth = MeasureText(TextFormat("%d", totalScore), 42);
