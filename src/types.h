@@ -2,6 +2,9 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+#define TOTAL_SCENARIOS 10
+#define TOTAL_FLASHCARDS 30
+
 typedef enum {
     MENU_SCREEN,
     FLASHCARD_SCREEN,
