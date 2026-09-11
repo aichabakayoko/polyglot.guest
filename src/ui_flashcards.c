@@ -3,6 +3,8 @@
 
 extern GameState state;
 extern Font arabicFont;
+extern void saveProgress(const GameState* state);
+extern void loadProgress(GameState* state);
 
 void drawFlashcard(Flashcard* gameCards, int totalCards) {
     ClearBackground((Color){13, 27, 42, 255}); 

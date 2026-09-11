@@ -4,6 +4,8 @@
 
 extern GameState state;
 extern Font arabicFont;
+extern void saveProgress(const GameState* state);
+extern void loadProgress(GameState* state);
 
 // Static texture variable for lazy loading merchant.png
 static Texture2D merchantTexture;

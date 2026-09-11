@@ -3,6 +3,8 @@
 #include "types.h"
 
 extern GameState state;
+extern void saveProgress(const GameState* state);
+extern void loadProgress(GameState* state);
 
 // Static texture variable for lazy loading trophy.png
 static Texture2D trophyTexture;

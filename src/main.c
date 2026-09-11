@@ -7,20 +7,9 @@
 #include <stdbool.h>
 
 extern GameState state;
+extern void saveProgress(const GameState* state);
+extern void loadProgress(GameState* state);
 Font arabicFont;
-
-// Function definitions to resolve backend references
-int loadScenarios(Scenario* scenarios) {
-    return 0;
-}
-
-void loadProgress(GameState* src_state) {
-    // Temporary stub
-}
-
-void saveProgress(const GameState* src_state) {
-    // Temporary stub
-}
 
 static int totalCards = 0;
 static Flashcard gameCards[30];

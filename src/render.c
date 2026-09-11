@@ -3,10 +3,10 @@
 #include "ui_flashcards.h"
 #include "ui_scenarios.h"
 #include "ui_progress.h"
-#include "ui_settings.h"
-#include "ui_infobar.h"
 
 extern GameState state;
+extern void saveProgress(const GameState* state);
+extern void loadProgress(GameState* state);
 
 // Global scenarios array and count exported from data.c
 extern Scenario gameScenarios[];
@@ -21,7 +21,7 @@ void RenderCurrentScreen(Flashcard* gameCards, int totalCards) {
             drawFlashcard(gameCards, totalCards);
             break;
         case SCENARIO_SCREEN:
-            drawScenario(gameScenarios, totalScenarios);
+            drawScenario(gameScenarios, 10);
             break;
         case PROGRESS_SCREEN:
             drawProgress();
