@@ -4,4 +4,4 @@ If (!(Test-Path -Path "build")) {
 }
 
 # Compile using your exact local configuration
-gcc src/main.c src/render.c src/ui_menu.c src/ui_flashcards.c src/ui_scenarios.c src/ui_progress.c src/ui_settings.c src/ui_infobar.c src/logic.c src/data.c -I"C:/raylib/raylib/src" -L"C:/raylib/raylib/src" -lraylib -lopengl32 -lgdi32 -lwinmm -o ./build/game.exe
+gcc src/main.c src/render.c src/ui_menu.c src/ui_flashcards.c src/ui_scenarios.c src/ui_progress.c src/logic.c src/data.c -I"C:/raylib/raylib/src" -L"C:/raylib/raylib/src" -lraylib -lopengl32 -lgdi32 -lwinmm -o ./build/game.exe
