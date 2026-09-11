@@ -50,3 +50,33 @@ int loadFlashcards(Flashcard* cards) {
     }
     return 30;
 }
+
+Scenario scenarios[10] = {
+    // 0: Coffee
+    {"من فضلك أريد قهوة", "Min fadlik ureedu qahwah", "Please, I want coffee", {"Shukran", "Marhaban", "Afwan"}, 0, 10},
+    // 1: Market
+    {"كم سعر هذا؟", "Kam si'r hadha?", "How much is this?", {"Marhaban", "Kam si'r hadha?", "Shukran"}, 1, 10},
+    // 2: Taxi
+    {"إلى المحطة من فضلك", "Ila al-mahattah min fadlik", "To the station please", {"Afwan", "Na'am", "Ila al-mahattah min fadlik"}, 2, 10},
+    // 3: Price
+    {"بكم هذا؟", "Bikam hadha?", "How much is this?", {"Bikam hadha?", "Shukran", "Na'am"}, 0, 10},
+    // 4: Hospital
+    {"أين المستشفى؟", "Ayna al-mustashfa?", "Where is the hospital?", {"Laa", "Ayna al-mustashfa?", "Marhaban"}, 1, 10},
+    // 5: Goodbye
+    {"مع السلامة", "Ma'a as-salamah", "Goodbye", {"Afwan", "Shukran", "Ma'a as-salamah"}, 2, 10},
+    // 6: Thanks
+    {"شكرا جزيلا", "Shukran jazeelan", "Thank you very much", {"Shukran jazeelan", "Ayna?", "Bikam?"}, 0, 10},
+    // 7: Welcome
+    {"عفوا", "Afwan", "You are welcome", {"Laa", "Afwan", "Na'am"}, 1, 10},
+    // 8: Greeting
+    {"كيف حالك؟", "Kayfa haluk?", "How are you?", {"Shukran", "Marhaban", "Kayfa haluk?"}, 2, 10},
+    // 9: Water
+    {"أريد ماء من فضلك", "Ureedu maa'an min fadlik", "I want water please", {"Ureedu maa'an min fadlik", "Ma'a as-salamah", "Afwan"}, 0, 10}
+};
+
+int loadScenarios(Scenario* sc) {
+    for (int i = 0; i < 10; i++) {
+        sc[i] = scenarios[i];
+    }
+    return 10;
+}
