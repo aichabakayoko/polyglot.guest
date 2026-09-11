@@ -1,4 +1,5 @@
 #include "data.h"
+#include <stddef.h>
 
 Flashcard flashcards[30] = {
     // Greetings (1-5)
