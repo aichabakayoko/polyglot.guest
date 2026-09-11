@@ -3,6 +3,6 @@
 
 #include "types.h"
 
-void drawScenario(Scenario* gameScenarios, int totalScenarios);
+void drawScenario(void);
 
 #endif
