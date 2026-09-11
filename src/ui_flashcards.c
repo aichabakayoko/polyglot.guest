@@ -2,6 +2,7 @@
 #include "raylib.h"
 
 extern GameState state;
+extern Font arabicFont;
 
 void drawFlashcard(Flashcard* gameCards, int totalCards) {
     ClearBackground((Color){13, 27, 42, 255}); 
@@ -27,7 +28,14 @@ void drawFlashcard(Flashcard* gameCards, int totalCards) {
     Color parchment = (Color){ 245, 237, 208, 255 };
     DrawRectangleRounded((Rectangle){ 320, 100, 640, 380 }, 0.04f, 4, parchment);
     
-    DrawText(currentCard.arabic, 320 + (640/2) - (MeasureText(currentCard.arabic, 48)/2), 160, 48, BLACK);
+    // Render Arabic Text with custom font (DrawTextEx)
+    Vector2 arabicSize = MeasureTextEx(arabicFont, currentCard.arabic, 48, 2);
+    Vector2 arabicPos = {
+        320 + (640 / 2.0f) - (arabicSize.x / 2.0f),
+        160
+    };
+    DrawTextEx(arabicFont, currentCard.arabic, arabicPos, 48, 2, BLACK);
+
     DrawText(currentCard.transliteration, 320 + (640/2) - (MeasureText(currentCard.transliteration, 22)/2), 250, 22, DARKGRAY);
 
     if (state.isRevealed == 1) {

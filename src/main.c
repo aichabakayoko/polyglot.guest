@@ -7,6 +7,7 @@
 #include <stdbool.h>
 
 extern GameState state;
+Font arabicFont;
 
 // Function definitions to resolve backend references
 int loadScenarios(Scenario* scenarios) {
@@ -29,6 +30,7 @@ static Scenario gameScenarios[3];
 
 int main(void) {
     InitWindow(1280, 720, "Polyglot Quest");
+    arabicFont = LoadFontEx("assets/fonts/amiri-regular.ttf", 64, NULL, 0);
     SetTargetFPS(60);
 
     // Load Flashcards and Scenarios
@@ -51,6 +53,7 @@ int main(void) {
     }
 
     saveProgress(&state);
+    UnloadFont(arabicFont);
 
     CloseWindow();
     return 0;

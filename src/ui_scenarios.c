@@ -3,6 +3,7 @@
 #include "types.h"
 
 extern GameState state;
+extern Font arabicFont;
 
 void drawScenario(void) {
     ClearBackground((Color){13, 27, 42, 255});
