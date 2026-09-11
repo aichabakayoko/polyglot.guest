@@ -7,7 +7,7 @@
 #include "ui_infobar.h"
 
 extern GameState state;
-extern Scenario gameScenarios[];
+extern Scenario scenarios[]; // Updated from gameScenarios to match data.c
 extern int totalScenarios; 
 
 void RenderCurrentScreen(Flashcard* gameCards, int totalCards) {
@@ -19,7 +19,7 @@ void RenderCurrentScreen(Flashcard* gameCards, int totalCards) {
             drawFlashcard(gameCards, totalCards);
             break;
         case SCENARIO_SCREEN:
-            drawScenario(gameScenarios, 10); 
+            drawScenario(scenarios, 10); // Pass scenarios array
             break;
         case PROGRESS_SCREEN:
             drawProgress();
