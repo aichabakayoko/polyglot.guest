@@ -52,8 +52,8 @@ polyglot.guest/
     ├── logic.c / .h              # Core state machine, scoring, and input validation
     ├── main.c                    # Game entry point, engine loop, and UI rendering
     ├── render.c / .h             # Screen rendering dispatcher
-    ├── ui_flashcards.c / .h      # Flashcard practice screen
     ├── ui_menu.c / .h            # Main Menu UI
+    ├── ui_flashcards.c / .h      # Flashcard practice screen
     ├── ui_progress.c / .h        # Progress & trophy screen
     ├── ui_scenarios.c / .h       # Dialogue scenario screen
     └── types.h                   # Shared structures, screens, and game states
@@ -73,7 +73,7 @@ polyglot.guest/
 
 To compile and launch the application directly:
 
-**PowerShell**
+PowerShell
 
 ```powershell
 # Run the automated build script
@@ -82,7 +82,7 @@ To compile and launch the application directly:
 
 Or compile manually using GCC:
 
-**PowerShell**
+PowerShell
 
 ```powershell
 gcc -o PolyglotQuest.exe src/*.c -lraylib -lopengl32 -lgdi32 -lwinmm
