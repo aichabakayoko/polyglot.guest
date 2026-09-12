@@ -7,17 +7,18 @@ extern Font arabicFont;
 extern void saveProgress(const GameState* state);
 extern void loadProgress(GameState* state);
 
-// Static texture variable for lazy loading merchant.png
 static Texture2D merchantTexture;
 static bool merchantLoaded = false;
 
 void drawScenario(Scenario* gameScenarios, int totalScenarios) {
-    // Override totalScenarios to 10 if necessary, or use the passed value
     int scenarioLimit = (totalScenarios > 0) ? totalScenarios : 10;
 
-    // Lazy-load merchant texture when scenario screen opens
     if (!merchantLoaded) {
-        merchantTexture = LoadTexture("assets/images/merchant.png");
+        if (FileExists("assets/images/merchant.png")) {
+            merchantTexture = LoadTexture("assets/images/merchant.png");
+        } else if (FileExists("assets/merchant.png")) {
+            merchantTexture = LoadTexture("assets/merchant.png");
+        }
         merchantLoaded = true;
     }
 
@@ -28,7 +29,6 @@ void drawScenario(Scenario* gameScenarios, int totalScenarios) {
         return;
     }
 
-    // Access scenario safely with modulo calculation against 10 scenarios
     Scenario current = gameScenarios[state.currentScenarioStep % scenarioLimit];
 
     // Top Step Indicator
@@ -38,7 +38,7 @@ void drawScenario(Scenario* gameScenarios, int totalScenarios) {
         DrawText(TextFormat("%d", i + 1), 480 + (i * 80) - 5, 42, 16, BLACK);
     }
 
-    // Left Panel: NPC Frame (Merchant image)
+    // NPC Frame
     Rectangle npcFrame = { 60, 100, 320, 520 };
     DrawRectangleRec(npcFrame, (Color){27, 58, 92, 255});
     DrawRectangleLinesEx(npcFrame, 3, GOLD);
@@ -57,11 +57,10 @@ void drawScenario(Scenario* gameScenarios, int totalScenarios) {
         DrawText("MERCHANT NPC", 120, 340, 20, LIGHTGRAY);
     }
 
-    // Right Panel: Dialogue & Options
+    // Dialogue Box
     Rectangle dialogueBox = { 420, 100, 800, 180 };
     DrawRectangleRounded(dialogueBox, 0.04f, 4, (Color){245, 237, 208, 255});
 
-    // Arabic Merchant Dialogue using DrawTextEx
     Vector2 arabicSize = MeasureTextEx(arabicFont, current.prompt, 32, 2);
     Vector2 arabicPos = {
         dialogueBox.x + (dialogueBox.width / 2.0f) - (arabicSize.x / 2.0f),
@@ -69,10 +68,9 @@ void drawScenario(Scenario* gameScenarios, int totalScenarios) {
     };
     DrawTextEx(arabicFont, current.prompt, arabicPos, 32, 2, BLACK);
 
-    // English Translation
     DrawText(current.translation, dialogueBox.x + (dialogueBox.width / 2.0f) - (MeasureText(current.translation, 20) / 2.0f), dialogueBox.y + 110, 20, DARKGRAY);
 
-    // Option Buttons
+    // Options
     Vector2 mousePos = GetMousePosition();
     for (int i = 0; i < 3; i++) {
         Rectangle optionBtn = { 420, 310 + (i * 90), 800, 70 };
@@ -83,8 +81,6 @@ void drawScenario(Scenario* gameScenarios, int totalScenarios) {
 
         DrawText(TextFormat("%c)", 'A' + i), optionBtn.x + 25, optionBtn.y + 22, 22, GOLD);
 
-        // Arabic Option Text
-        Vector2 optArabicSize = MeasureTextEx(arabicFont, current.options[i], 24, 2);
         Vector2 optArabicPos = {
             optionBtn.x + 80,
             optionBtn.y + 20

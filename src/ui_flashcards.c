@@ -1,5 +1,6 @@
 #include "ui_flashcards.h"
 #include "raylib.h"
+#include "types.h"
 
 extern GameState state;
 extern Font arabicFont;
@@ -26,17 +27,22 @@ void drawFlashcard(Flashcard* gameCards, int totalCards) {
     DrawRectangle(50, 110, 200, 45, MAROON); 
     DrawText("Basics", 70, 122, 18, WHITE);
 
-    // Central Card
+    // Central Card Frame
     Color parchment = (Color){ 245, 237, 208, 255 };
     DrawRectangleRounded((Rectangle){ 320, 100, 640, 380 }, 0.04f, 4, parchment);
     
-    // Render Arabic Text with custom font (DrawTextEx)
+    // Arabic Render with Font Verification
     Vector2 arabicSize = MeasureTextEx(arabicFont, currentCard.arabic, 48, 2);
     Vector2 arabicPos = {
         320 + (640 / 2.0f) - (arabicSize.x / 2.0f),
         160
     };
-    DrawTextEx(arabicFont, currentCard.arabic, arabicPos, 48, 2, BLACK);
+    
+    if (arabicFont.texture.id > 0) {
+        DrawTextEx(arabicFont, currentCard.arabic, arabicPos, 48, 2, BLACK);
+    } else {
+        DrawText(currentCard.arabic, 320 + (640/2) - (MeasureText(currentCard.arabic, 30)/2), 160, 30, BLACK);
+    }
 
     DrawText(currentCard.transliteration, 320 + (640/2) - (MeasureText(currentCard.transliteration, 22)/2), 250, 22, DARKGRAY);
 
