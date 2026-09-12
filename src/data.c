@@ -1,5 +1,6 @@
 #include "data.h"
 #include <stddef.h>
+#include <stdio.h>
 
 Flashcard flashcards[30] = {
     // Greetings (1-5)
@@ -46,6 +47,7 @@ Flashcard flashcards[30] = {
 };
 
 int loadFlashcards(Flashcard* cards) {
+    if (cards == NULL) return 0;
     for (int i = 0; i < 30; i++) {
         cards[i] = flashcards[i];
     }
@@ -81,4 +83,24 @@ int loadScenarios(Scenario* sc) {
         sc[i] = gameScenarios[i];
     }
     return 10;
+}
+
+int saveProgress(const GameState* state) {
+    if (state == NULL) return 0;
+    FILE* file = fopen("savegame.dat", "wb");
+    if (file == NULL) return 0;
+    
+    size_t written = fwrite(state, sizeof(GameState), 1, file);
+    fclose(file);
+    return (written == 1) ? 1 : 0;
+}
+
+int loadProgress(GameState* state) {
+    if (state == NULL) return 0;
+    FILE* file = fopen("savegame.dat", "rb");
+    if (file == NULL) return 0;
+    
+    size_t read = fread(state, sizeof(GameState), 1, file);
+    fclose(file);
+    return (read == 1) ? 1 : 0;
 }
