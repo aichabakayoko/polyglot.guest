@@ -23,7 +23,7 @@ To prevent merge conflicts and maintain clean architectural boundaries, our team
 
 | File / Module | Owner | Responsibility |
 | :--- | :--- | :--- |
-| **`main.c`**, **`render.c/.h`**, **`ui_*.c/.h`** | **Nayima** | Window initialization, screen state dispatcher, and all UI screen drawing (`menu`, `flashcards`, `scenarios`, `progress`). |
+| **`main.c`**, **`render.c/.h`**, **`ui_menu.c/.h`**, **`ui_flashcards.c/.h`**, **`ui_scenarios.c/.h`**, **`ui_progress.c/.h`** | **Nayima** | Window initialization, screen state dispatcher, and all UI screen drawing (`menu`, `flashcards`, `scenarios`, `progress`). |
 | **`logic.c/.h`**, **`types.h`** | **Saïda** | State machine, scoring logic, streak/XP mechanics, mastery calculations, and shared types. |
 | **`data.c/.h`**, **`assets/`** | **Aïcha** | Flashcard/scenario data layers, persistence (save/load/clear progress), asset management, and repo hygiene. |
 
@@ -52,7 +52,7 @@ polyglot.guest/
     ├── logic.c / .h              # Core state machine, scoring, and input validation
     ├── main.c                    # Game entry point, engine loop, and UI rendering
     ├── render.c / .h             # Screen rendering dispatcher
-    ├── ui_menu.c / .h            # Main Menu UI
+    ├── ui_menu.c / .h             # Main Menu UI
     ├── ui_flashcards.c / .h      # Flashcard practice screen
     ├── ui_progress.c / .h        # Progress & trophy screen
     ├── ui_scenarios.c / .h       # Dialogue scenario screen
