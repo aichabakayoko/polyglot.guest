@@ -33,11 +33,28 @@ int main(void) {
     for (int i = 0xFB50; i <= 0xFDFF; i++) codepoints[count++] = i; 
     for (int i = 0xFE70; i <= 0xFEFC; i++) codepoints[count++] = i; 
 
-    if (FileExists("assets/fonts/amiri-regular.ttf")) {
-        arabicFont = LoadFontEx("assets/fonts/amiri-regular.ttf", 64, codepoints, count);
-        printf("[SUCCESS] Loaded Amiri font.\n");
-    } else {
-        printf("[WARNING] Font not found at assets/fonts/amiri-regular.ttf!\n");
+    const char* fontPaths[] = {
+        "assets/fonts/amiri-regular.ttf",
+        "assets/amiri-regular.ttf",
+        "../assets/fonts/amiri-regular.ttf",
+        "../assets/amiri-regular.ttf"
+    };
+
+    bool fontLoaded = false;
+    for (int i = 0; i < 4; i++) {
+        printf("[CHECK] Looking for amiri-regular.ttf at: %s (exists: %s)\n",
+               fontPaths[i], FileExists(fontPaths[i]) ? "yes" : "no");
+
+        if (FileExists(fontPaths[i])) {
+            arabicFont = LoadFontEx(fontPaths[i], 64, codepoints, count);
+            printf("[SUCCESS] Loaded Amiri font from: %s\n", fontPaths[i]);
+            fontLoaded = true;
+            break;
+        }
+    }
+
+    if (!fontLoaded) {
+        printf("[WARNING] Font not found in any candidate path!\n");
         arabicFont = GetFontDefault();
     }
 
