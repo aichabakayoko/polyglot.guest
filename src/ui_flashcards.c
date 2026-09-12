@@ -31,18 +31,14 @@ void drawFlashcard(Flashcard* gameCards, int totalCards) {
     Color parchment = (Color){ 245, 237, 208, 255 };
     DrawRectangleRounded((Rectangle){ 320, 100, 640, 380 }, 0.04f, 4, parchment);
     
-    // Arabic Render with Font Verification
+    // Measure and draw Arabic text
     Vector2 arabicSize = MeasureTextEx(arabicFont, currentCard.arabic, 48, 2);
     Vector2 arabicPos = {
         320 + (640 / 2.0f) - (arabicSize.x / 2.0f),
         160
     };
     
-    if (arabicFont.texture.id > 0) {
-        DrawTextEx(arabicFont, currentCard.arabic, arabicPos, 48, 2, BLACK);
-    } else {
-        DrawText(currentCard.arabic, 320 + (640/2) - (MeasureText(currentCard.arabic, 30)/2), 160, 30, BLACK);
-    }
+    DrawTextEx(arabicFont, currentCard.arabic, arabicPos, 48, 2, BLACK);
 
     DrawText(currentCard.transliteration, 320 + (640/2) - (MeasureText(currentCard.transliteration, 22)/2), 250, 22, DARKGRAY);
 

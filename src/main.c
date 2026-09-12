@@ -22,20 +22,20 @@ int main(void) {
     InitWindow(1280, 720, "Polyglot Quest");
     SetTargetFPS(60);
 
-    // Build codepoints array for ASCII + Arabic script
-    int codepoints[1200];
+    // Build codepoints list including Presentation Forms A & B
+    int codepoints[1500];
     int count = 0;
 
     for (int i = 0x0020; i <= 0x007E; i++) codepoints[count++] = i; // ASCII
     for (int i = 0x0600; i <= 0x06FF; i++) codepoints[count++] = i; // Standard Arabic
-    for (int i = 0xFB50; i <= 0xFDFF; i++) codepoints[count++] = i; // Forms-A
-    for (int i = 0xFE70; i <= 0xFEFC; i++) codepoints[count++] = i; // Forms-B
+    for (int i = 0xFB50; i <= 0xFDFF; i++) codepoints[count++] = i; // Presentation Forms-A
+    for (int i = 0xFE70; i <= 0xFEFC; i++) codepoints[count++] = i; // Presentation Forms-B
 
     if (FileExists("assets/fonts/amiri-regular.ttf")) {
         arabicFont = LoadFontEx("assets/fonts/amiri-regular.ttf", 64, codepoints, count);
         printf("[SUCCESS] Loaded Amiri font with %d codepoints.\n", count);
     } else {
-        printf("[WARNING] assets/fonts/amiri-regular.ttf not found! Using default font.\n");
+        printf("[WARNING] Font not found at assets/fonts/amiri-regular.ttf!\n");
         arabicFont = GetFontDefault();
     }
 
