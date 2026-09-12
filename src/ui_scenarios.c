@@ -14,10 +14,10 @@ void drawScenario(Scenario* gameScenarios, int totalScenarios) {
     int scenarioLimit = (totalScenarios > 0) ? totalScenarios : 10;
 
     if (!merchantLoaded) {
-        if (FileExists("assets/images/merchant.png")) {
-            merchantTexture = LoadTexture("assets/images/merchant.png");
-        } else if (FileExists("assets/merchant.png")) {
+        if (FileExists("assets/merchant.png")) {
             merchantTexture = LoadTexture("assets/merchant.png");
+        } else if (FileExists("assets/images/merchant.png")) {
+            merchantTexture = LoadTexture("assets/images/merchant.png");
         }
         merchantLoaded = true;
     }

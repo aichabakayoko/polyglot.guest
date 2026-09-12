@@ -6,14 +6,16 @@ extern GameState state;
 extern void saveProgress(const GameState* state);
 extern void loadProgress(GameState* state);
 
-// Static texture variable for lazy loading trophy.png
 static Texture2D trophyTexture;
 static bool trophyLoaded = false;
 
 void drawProgress(void) {
-    // Lazy-load trophy texture when progress screen opens
     if (!trophyLoaded) {
-        trophyTexture = LoadTexture("assets/images/trophy.png");
+        if (FileExists("assets/trophy.png")) {
+            trophyTexture = LoadTexture("assets/trophy.png");
+        } else if (FileExists("assets/images/trophy.png")) {
+            trophyTexture = LoadTexture("assets/images/trophy.png");
+        }
         trophyLoaded = true;
     }
 
@@ -38,10 +40,8 @@ void drawProgress(void) {
     DrawRectangleRec(trophyBox, (Color){27, 58, 92, 255});
     DrawRectangleLinesEx(trophyBox, 3, GOLD);
     
-    // Draw real trophy texture if loaded, or fallback background circle
     DrawCircle(60 + 130, 120 + 120, 50, (Color){233, 196, 106, 255});
     if (trophyTexture.id > 0) {
-        // Draw trophy image centered inside the gold circle
         DrawTexturePro(
             trophyTexture,
             (Rectangle){ 0, 0, (float)trophyTexture.width, (float)trophyTexture.height },
