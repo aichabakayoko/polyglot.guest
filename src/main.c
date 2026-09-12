@@ -16,6 +16,21 @@ static Flashcard gameCards[30];
 static int totalScenarios = 0;
 static Scenario gameScenarios[10];
 
+void ResetGameData(void) {
+    totalCards = loadFlashcards(gameCards);
+    totalScenarios = loadScenarios(gameScenarios);
+
+    state.totalScore = 0;
+    state.correctCount = 0;
+    state.wrongCount = 0;
+    state.currentCardIndex = 0;
+    state.currentScenarioStep = 0;
+    state.isRevealed = 0;
+
+    remove("savegame.dat");
+    printf("[INFO] ResetGameData: flashcards/scenarios reloaded, GameState zeroed, savegame.dat removed.\n");
+}
+
 int main(void) {
     InitWindow(1280, 720, "Polyglot Quest");
     

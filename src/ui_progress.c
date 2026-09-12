@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 extern GameState state;
+extern void ResetGameData(void); // defined in main.c: reloads flashcards/scenarios, zeroes GameState, deletes save file
 
 static Texture2D trophyTexture;
 static bool trophyLoaded = false;
@@ -123,17 +124,23 @@ void drawProgress(void) {
     DrawRectangle(barX, masteryBox.y + 280, barWidth, barHeight, DARKGRAY);
     DrawRectangle(barX, masteryBox.y + 280, (int)(0.0f * barWidth), barHeight, BLUE);
 
-    Rectangle btnReplay = { 1280 / 2 - 240, 590, 220, 50 };
-    Rectangle btnMenu   = { 1280 / 2 + 20,  590, 220, 50 };
+    Rectangle btnReplay = { 1280 / 2 - 370, 590, 220, 50 };
+    Rectangle btnMenu   = { 1280 / 2 - 110, 590, 220, 50 };
+    Rectangle btnReset  = { 1280 / 2 + 150, 590, 220, 50 };
 
     Vector2 mousePos = GetMousePosition();
     bool overReplay = CheckCollisionPointRec(mousePos, btnReplay);
     bool overMenu   = CheckCollisionPointRec(mousePos, btnMenu);
+    bool overReset  = CheckCollisionPointRec(mousePos, btnReset);
 
     if (overReplay && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         state.currentScreen = SCENARIO_SCREEN;
     }
     if (overMenu && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        state.currentScreen = MENU_SCREEN;
+    }
+    if (overReset && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        ResetGameData();
         state.currentScreen = MENU_SCREEN;
     }
 
@@ -142,6 +149,9 @@ void drawProgress(void) {
 
     DrawRectangleRec(btnMenu, overMenu ? (Color){40, 180, 75, 255} : (Color){30, 140, 58, 255});
     DrawText("BACK TO MENU", btnMenu.x + (btnMenu.width / 2) - (MeasureText("BACK TO MENU", 16) / 2), btnMenu.y + 17, 16, WHITE);
+
+    DrawRectangleRec(btnReset, overReset ? (Color){190, 60, 60, 255} : (Color){150, 40, 40, 255});
+    DrawText("RESET PROGRESS", btnReset.x + (btnReset.width / 2) - (MeasureText("RESET PROGRESS", 16) / 2), btnReset.y + 17, 16, WHITE);
 
     DrawText("Press [M] to return to Main Menu", 60, 40, 14, LIGHTGRAY);
 }
