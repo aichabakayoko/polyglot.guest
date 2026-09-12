@@ -1,26 +1,55 @@
 #include "ui_scenarios.h"
 #include "raylib.h"
 #include "types.h"
+#include <stdio.h>
 
 extern GameState state;
 extern Font arabicFont;
-extern void saveProgress(const GameState* state);
-extern void loadProgress(GameState* state);
 
-static Texture2D merchantTexture;
-static bool merchantLoaded = false;
+static Texture2D merchantTexture = { 0 };
+static bool merchantAttempted = false;
+
+static void EnsureMerchantLoaded(void) {
+    if (merchantAttempted) return;
+    merchantAttempted = true;
+
+    const char* appDir = GetApplicationDirectory();
+
+    const char* candidatePaths[] = {
+        "assets/merchant.png",
+        "assets/images/merchant.png",
+        "../assets/merchant.png",
+        "../assets/images/merchant.png",
+        TextFormat("%sassets/merchant.png", appDir),
+        TextFormat("%sassets/images/merchant.png", appDir)
+    };
+
+    for (int i = 0; i < 6; i++) {
+        printf("[CHECK] Looking for merchant.png at: %s (exists: %s)\n",
+               candidatePaths[i], FileExists(candidatePaths[i]) ? "yes" : "no");
+
+        if (FileExists(candidatePaths[i])) {
+            Image img = LoadImage(candidatePaths[i]);
+            if (img.data != NULL) {
+                merchantTexture = LoadTextureFromImage(img);
+                UnloadImage(img);
+                printf("[SUCCESS] Merchant texture loaded from: %s (ID: %u)\n",
+                       candidatePaths[i], merchantTexture.id);
+                return;
+            } else {
+                printf("[WARNING] File found but failed to decode: %s\n", candidatePaths[i]);
+            }
+        }
+    }
+
+    printf("[WARNING] Failed to load merchant image from all candidate paths!\n");
+}
 
 void drawScenario(Scenario* gameScenarios, int totalScenarios) {
     int scenarioLimit = (totalScenarios > 0) ? totalScenarios : 10;
 
-    if (!merchantLoaded) {
-        if (FileExists("assets/merchant.png")) {
-            merchantTexture = LoadTexture("assets/merchant.png");
-        } else if (FileExists("assets/images/merchant.png")) {
-            merchantTexture = LoadTexture("assets/images/merchant.png");
-        }
-        merchantLoaded = true;
-    }
+    // Ensure texture is safely loaded into GPU memory
+    EnsureMerchantLoaded();
 
     ClearBackground((Color){13, 27, 42, 255});
 
@@ -66,7 +95,12 @@ void drawScenario(Scenario* gameScenarios, int totalScenarios) {
         dialogueBox.x + (dialogueBox.width / 2.0f) - (arabicSize.x / 2.0f),
         dialogueBox.y + 35
     };
-    DrawTextEx(arabicFont, current.prompt, arabicPos, 32, 2, BLACK);
+
+    if (arabicFont.texture.id > 0) {
+        DrawTextEx(arabicFont, current.prompt, arabicPos, 32, 2, BLACK);
+    } else {
+        DrawText(current.prompt, dialogueBox.x + 40, dialogueBox.y + 35, 24, BLACK);
+    }
 
     DrawText(current.translation, dialogueBox.x + (dialogueBox.width / 2.0f) - (MeasureText(current.translation, 20) / 2.0f), dialogueBox.y + 110, 20, DARKGRAY);
 
@@ -85,7 +119,12 @@ void drawScenario(Scenario* gameScenarios, int totalScenarios) {
             optionBtn.x + 80,
             optionBtn.y + 20
         };
-        DrawTextEx(arabicFont, current.options[i], optArabicPos, 24, 2, WHITE);
+
+        if (arabicFont.texture.id > 0) {
+            DrawTextEx(arabicFont, current.options[i], optArabicPos, 24, 2, WHITE);
+        } else {
+            DrawText(current.options[i], optionBtn.x + 80, optionBtn.y + 22, 20, WHITE);
+        }
 
         if (overOption && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             if (i == current.correctIndex) {

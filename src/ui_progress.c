@@ -1,21 +1,34 @@
 #include "ui_progress.h"
 #include "raylib.h"
 #include "types.h"
+#include <stdio.h>
 
 extern GameState state;
-extern void saveProgress(const GameState* state);
-extern void loadProgress(GameState* state);
 
 static Texture2D trophyTexture;
 static bool trophyLoaded = false;
 
 void drawProgress(void) {
     if (!trophyLoaded) {
-        if (FileExists("assets/trophy.png")) {
-            trophyTexture = LoadTexture("assets/trophy.png");
-        } else if (FileExists("assets/images/trophy.png")) {
-            trophyTexture = LoadTexture("assets/images/trophy.png");
+        const char* paths[] = {
+            "assets/trophy.png",
+            "assets/images/trophy.png",
+            "../assets/trophy.png",
+            "../assets/images/trophy.png"
+        };
+
+        for (int i = 0; i < 4; i++) {
+            if (FileExists(paths[i])) {
+                trophyTexture = LoadTexture(paths[i]);
+                printf("[SUCCESS] Loaded trophy texture from: %s\n", paths[i]);
+                break;
+            }
         }
+
+        if (trophyTexture.id == 0) {
+            printf("[WARNING] Could not find trophy.png in any standard assets path!\n");
+        }
+
         trophyLoaded = true;
     }
 
@@ -32,14 +45,14 @@ void drawProgress(void) {
 
     int totalAnswers = state.correctCount + state.wrongCount;
     float accuracyPercent = (totalAnswers > 0) ? ((float)state.correctCount / totalAnswers) * 100.0f : 0.0f;
-    
+
     int totalScore = (state.correctCount * 10) - (state.wrongCount * 5);
     if (totalScore < 0) totalScore = 0;
 
     Rectangle trophyBox = { 60, 120, 260, 440 };
     DrawRectangleRec(trophyBox, (Color){27, 58, 92, 255});
     DrawRectangleLinesEx(trophyBox, 3, GOLD);
-    
+
     DrawCircle(60 + 130, 120 + 120, 50, (Color){233, 196, 106, 255});
     if (trophyTexture.id > 0) {
         DrawTexturePro(
@@ -51,7 +64,7 @@ void drawProgress(void) {
             WHITE
         );
     } else {
-        DrawText("🏆", 60 + 130 - 20, 120 + 95, 40, WHITE);
+        DrawText("Trophy", 60 + 130 - 30, 120 + 108, 20, WHITE);
     }
 
     int scoreLabelWidth = MeasureText("TOTAL SCORE", 20);
@@ -69,9 +82,9 @@ void drawProgress(void) {
     int starStartX = 60 + 130 - (5 * 24) / 2;
     for (int i = 0; i < 5; i++) {
         if (i < starsEarned) {
-            DrawText("★", starStartX + (i * 24), starY, 24, GOLD);
+            DrawText("*", starStartX + (i * 24), starY, 24, GOLD);
         } else {
-            DrawText("☆", starStartX + (i * 24), starY, 24, GRAY);
+            DrawText("-", starStartX + (i * 24), starY, 24, GRAY);
         }
     }
 
@@ -98,9 +111,9 @@ void drawProgress(void) {
     int barHeight = 22;
 
     DrawText("Basics (Greetings & Introductions)", barX, masteryBox.y + 80, 16, LIGHTGRAY);
-    DrawRectangle(barX, masteryBox.y + 110, barWidth, barHeight, DARKGRAY); 
+    DrawRectangle(barX, masteryBox.y + 110, barWidth, barHeight, DARKGRAY);
     int fillWidthBasics = (int)((accuracyPercent / 100.0f) * barWidth);
-    DrawRectangle(barX, masteryBox.y + 110, fillWidthBasics, barHeight, GREEN); 
+    DrawRectangle(barX, masteryBox.y + 110, fillWidthBasics, barHeight, GREEN);
 
     DrawText("Marketplace (Numbers & Bartering)", barX, masteryBox.y + 165, 16, LIGHTGRAY);
     DrawRectangle(barX, masteryBox.y + 195, barWidth, barHeight, DARKGRAY);

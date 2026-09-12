@@ -11,3 +11,9 @@ gcc src/main.c src/render.c src/ui_menu.c src/ui_flashcards.c src/ui_scenarios.c
   "-I$RAYLIB_INC" `
   "-L$RAYLIB_LIB" `
   -o build/game.exe -lraylib -lopengl32 -lgdi32 -lwinmm
+
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "[SUCCESS] Build completed: build/game.exe" -ForegroundColor Green
+} else {
+    Write-Host "[ERROR] Build failed with exit code $LASTEXITCODE" -ForegroundColor Red
+}
