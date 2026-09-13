@@ -1,10 +1,38 @@
 #include "ui_progress.h"
 #include "raylib.h"
 #include "types.h"
+#include <stdio.h>
 
 extern GameState state;
+extern void ResetGameData(void); // defined in main.c: reloads flashcards/scenarios, zeroes GameState, deletes save file
+
+static Texture2D trophyTexture;
+static bool trophyLoaded = false;
 
 void drawProgress(void) {
+    if (!trophyLoaded) {
+        const char* paths[] = {
+            "assets/trophy.png",
+            "assets/images/trophy.png",
+            "../assets/trophy.png",
+            "../assets/images/trophy.png"
+        };
+
+        for (int i = 0; i < 4; i++) {
+            if (FileExists(paths[i])) {
+                trophyTexture = LoadTexture(paths[i]);
+                printf("[SUCCESS] Loaded trophy texture from: %s\n", paths[i]);
+                break;
+            }
+        }
+
+        if (trophyTexture.id == 0) {
+            printf("[WARNING] Could not find trophy.png in any standard assets path!\n");
+        }
+
+        trophyLoaded = true;
+    }
+
     ClearBackground((Color){13, 27, 42, 255});
 
     if (IsKeyPressed(KEY_M)) {
@@ -18,16 +46,27 @@ void drawProgress(void) {
 
     int totalAnswers = state.correctCount + state.wrongCount;
     float accuracyPercent = (totalAnswers > 0) ? ((float)state.correctCount / totalAnswers) * 100.0f : 0.0f;
-    
+
     int totalScore = (state.correctCount * 10) - (state.wrongCount * 5);
     if (totalScore < 0) totalScore = 0;
 
     Rectangle trophyBox = { 60, 120, 260, 440 };
     DrawRectangleRec(trophyBox, (Color){27, 58, 92, 255});
     DrawRectangleLinesEx(trophyBox, 3, GOLD);
-    
+
     DrawCircle(60 + 130, 120 + 120, 50, (Color){233, 196, 106, 255});
-    DrawText("🏆", 60 + 130 - 20, 120 + 95, 40, WHITE);
+    if (trophyTexture.id > 0) {
+        DrawTexturePro(
+            trophyTexture,
+            (Rectangle){ 0, 0, (float)trophyTexture.width, (float)trophyTexture.height },
+            (Rectangle){ 60 + 130 - 40, 120 + 120 - 40, 80, 80 },
+            (Vector2){ 0, 0 },
+            0.0f,
+            WHITE
+        );
+    } else {
+        DrawText("Trophy", 60 + 130 - 30, 120 + 108, 20, WHITE);
+    }
 
     int scoreLabelWidth = MeasureText("TOTAL SCORE", 20);
     int scoreNumWidth = MeasureText(TextFormat("%d", totalScore), 42);
@@ -44,9 +83,9 @@ void drawProgress(void) {
     int starStartX = 60 + 130 - (5 * 24) / 2;
     for (int i = 0; i < 5; i++) {
         if (i < starsEarned) {
-            DrawText("★", starStartX + (i * 24), starY, 24, GOLD);
+            DrawText("*", starStartX + (i * 24), starY, 24, GOLD);
         } else {
-            DrawText("☆", starStartX + (i * 24), starY, 24, GRAY);
+            DrawText("-", starStartX + (i * 24), starY, 24, GRAY);
         }
     }
 
@@ -73,9 +112,9 @@ void drawProgress(void) {
     int barHeight = 22;
 
     DrawText("Basics (Greetings & Introductions)", barX, masteryBox.y + 80, 16, LIGHTGRAY);
-    DrawRectangle(barX, masteryBox.y + 110, barWidth, barHeight, DARKGRAY); 
+    DrawRectangle(barX, masteryBox.y + 110, barWidth, barHeight, DARKGRAY);
     int fillWidthBasics = (int)((accuracyPercent / 100.0f) * barWidth);
-    DrawRectangle(barX, masteryBox.y + 110, fillWidthBasics, barHeight, GREEN); 
+    DrawRectangle(barX, masteryBox.y + 110, fillWidthBasics, barHeight, GREEN);
 
     DrawText("Marketplace (Numbers & Bartering)", barX, masteryBox.y + 165, 16, LIGHTGRAY);
     DrawRectangle(barX, masteryBox.y + 195, barWidth, barHeight, DARKGRAY);
@@ -85,17 +124,23 @@ void drawProgress(void) {
     DrawRectangle(barX, masteryBox.y + 280, barWidth, barHeight, DARKGRAY);
     DrawRectangle(barX, masteryBox.y + 280, (int)(0.0f * barWidth), barHeight, BLUE);
 
-    Rectangle btnReplay = { 1280 / 2 - 240, 590, 220, 50 };
-    Rectangle btnMenu   = { 1280 / 2 + 20,  590, 220, 50 };
+    Rectangle btnReplay = { 1280 / 2 - 370, 590, 220, 50 };
+    Rectangle btnMenu   = { 1280 / 2 - 110, 590, 220, 50 };
+    Rectangle btnReset  = { 1280 / 2 + 150, 590, 220, 50 };
 
     Vector2 mousePos = GetMousePosition();
     bool overReplay = CheckCollisionPointRec(mousePos, btnReplay);
     bool overMenu   = CheckCollisionPointRec(mousePos, btnMenu);
+    bool overReset  = CheckCollisionPointRec(mousePos, btnReset);
 
     if (overReplay && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
         state.currentScreen = SCENARIO_SCREEN;
     }
     if (overMenu && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        state.currentScreen = MENU_SCREEN;
+    }
+    if (overReset && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+        ResetGameData();
         state.currentScreen = MENU_SCREEN;
     }
 
@@ -104,6 +149,9 @@ void drawProgress(void) {
 
     DrawRectangleRec(btnMenu, overMenu ? (Color){40, 180, 75, 255} : (Color){30, 140, 58, 255});
     DrawText("BACK TO MENU", btnMenu.x + (btnMenu.width / 2) - (MeasureText("BACK TO MENU", 16) / 2), btnMenu.y + 17, 16, WHITE);
+
+    DrawRectangleRec(btnReset, overReset ? (Color){190, 60, 60, 255} : (Color){150, 40, 40, 255});
+    DrawText("RESET PROGRESS", btnReset.x + (btnReset.width / 2) - (MeasureText("RESET PROGRESS", 16) / 2), btnReset.y + 17, 16, WHITE);
 
     DrawText("Press [M] to return to Main Menu", 60, 40, 14, LIGHTGRAY);
 }
