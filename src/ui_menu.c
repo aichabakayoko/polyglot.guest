@@ -3,6 +3,8 @@
 #include "types.h"
 
 extern GameState state;
+extern void saveProgress(const GameState* state);
+extern void loadProgress(GameState* state);
 
 void drawMenu(void) {
     DrawText("POLYGLOT QUEST", 1280 / 2 - MeasureText("POLYGLOT QUEST", 48) / 2, 100, 48, (Color){233, 196, 106, 255}); 

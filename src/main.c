@@ -8,36 +8,75 @@
 
 extern GameState state;
 
-// Function definitions to resolve backend references
-int loadScenarios(Scenario* scenarios) {
-    return 0;
-}
-
-void loadProgress(GameState* src_state) {
-    // Temporary stub
-}
-
-void saveProgress(const GameState* src_state) {
-    // Temporary stub
-}
+Font arabicFont;
 
 static int totalCards = 0;
 static Flashcard gameCards[30];
 
 static int totalScenarios = 0;
-static Scenario gameScenarios[3];
+static Scenario gameScenarios[10];
+
+void ResetGameData(void) {
+    totalCards = loadFlashcards(gameCards);
+    totalScenarios = loadScenarios(gameScenarios);
+
+    state.totalScore = 0;
+    state.correctCount = 0;
+    state.wrongCount = 0;
+    state.currentCardIndex = 0;
+    state.currentScenarioStep = 0;
+    state.isRevealed = 0;
+
+    remove("savegame.dat");
+    printf("[INFO] ResetGameData: flashcards/scenarios reloaded, GameState zeroed, savegame.dat removed.\n");
+}
 
 int main(void) {
     InitWindow(1280, 720, "Polyglot Quest");
+    
+    // Change working directory to where the executable resides
+    ChangeDirectory(GetApplicationDirectory());
+    printf("[DEBUG] Current Working Directory: %s\n", GetWorkingDirectory());
+
     SetTargetFPS(60);
 
-    // Load Flashcards and Scenarios
+    int codepoints[1500];
+    int count = 0;
+
+    for (int i = 0x0020; i <= 0x007E; i++) codepoints[count++] = i; 
+    for (int i = 0x0600; i <= 0x06FF; i++) codepoints[count++] = i; 
+    for (int i = 0xFB50; i <= 0xFDFF; i++) codepoints[count++] = i; 
+    for (int i = 0xFE70; i <= 0xFEFC; i++) codepoints[count++] = i; 
+
+    const char* fontPaths[] = {
+        "assets/fonts/amiri-regular.ttf",
+        "assets/amiri-regular.ttf",
+        "../assets/fonts/amiri-regular.ttf",
+        "../assets/amiri-regular.ttf"
+    };
+
+    bool fontLoaded = false;
+    for (int i = 0; i < 4; i++) {
+        printf("[CHECK] Looking for amiri-regular.ttf at: %s (exists: %s)\n",
+               fontPaths[i], FileExists(fontPaths[i]) ? "yes" : "no");
+
+        if (FileExists(fontPaths[i])) {
+            arabicFont = LoadFontEx(fontPaths[i], 64, codepoints, count);
+            printf("[SUCCESS] Loaded Amiri font from: %s\n", fontPaths[i]);
+            fontLoaded = true;
+            break;
+        }
+    }
+
+    if (!fontLoaded) {
+        printf("[WARNING] Font not found in any candidate path!\n");
+        arabicFont = GetFontDefault();
+    }
+
     totalCards = loadFlashcards(gameCards);
     totalScenarios = loadScenarios(gameScenarios);
 
     loadProgress(&state);
-
-    printf("Successfully initialized backend! Loaded %d cards and %d scenarios.\n", totalCards, totalScenarios);
 
     state.currentScreen = MENU_SCREEN;
 
@@ -51,7 +90,8 @@ int main(void) {
     }
 
     saveProgress(&state);
-
+    UnloadFont(arabicFont);
     CloseWindow();
+
     return 0;
 }
