@@ -13,7 +13,6 @@ An interactive, C-based educational game built with [Raylib](https://github.com/
 - **Scenario Dialogue Mode:** Engage in 5-step conversational scenarios with NPC merchants, formatted dialogue boxes, and multi-choice options.
 - **Arabic Text Engine:** Built-in Right-to-Left (RTL) Arabic text rendering using Amiri TTF font and unicode codepoints.
 - **Progress & Mastery Tracking:** Live tracking of XP, streak count, category mastery percentages, and unlockable achievement trophies.
-- **Settings & Data Management:** Master volume slider, mute toggles, and a two-step confirmation progress reset.
 
 ---
 
@@ -100,8 +99,6 @@ During development, the team navigated several platform and architectural hurdle
 2. **Windows & OneDrive Asset Locks:** Executing inside OneDrive environments produced reparse link locks (`-a---l`), blocking standard runtime asset loads. Fixed by introducing multi-path asset fallbacks and changing execution directories dynamically via `GetApplicationDirectory()`.
 
 3. **Git File Lock Conflicts:** Git operations like `git pull` or branch checkout frequently hit `Permission denied` locks on `.git/FETCH_HEAD` due to concurrent background processes (OneDrive sync cycles and VS Code git auto-fetches). Unblocked using explicit stash workflows, `attrib` permissions resets, and commit non-edit flags.
-
-4. **Raylib Audio Capture Constraints:** Raylib's native audio module supports audio playback but lacks built-in microphone recording capabilities. Adapted pronunciation testing into a *hold-duration heuristic evaluation model* without adding heavy external dependencies.
 
 ---
 
